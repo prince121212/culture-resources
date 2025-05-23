@@ -20,6 +20,7 @@ import {
 } from '../validators/resource.validator';
 import { Request, Response } from 'express';
 import Resource from '../models/resource.model'; // 导入正确的Resource模型
+import { createComment, getResourceComments } from '../controllers/comment.controller';
 
 const router = Router();
 
@@ -63,5 +64,17 @@ router.delete(
 // Admin routes for link checking
 router.put('/:id/check-link', protect, isAdmin, resourceIdValidationRules(), validate, checkResourceLink);
 router.post('/check-links', protect, isAdmin, batchCheckResourceLinks);
+
+// 获取资源的评论
+router.get('/:id/comments', (req, res, next) => {
+  console.log('[资源路由日志] GET /resources/:id/comments 命中, id:', req.params.id);
+  return getResourceComments(req, res, next);
+});
+
+// 创建评论
+router.post('/:id/comments', (req, res, next) => {
+  console.log('[资源路由日志] POST /resources/:id/comments 命中, id:', req.params.id, 'body:', req.body);
+  return createComment(req, res, next);
+});
 
 export default router;

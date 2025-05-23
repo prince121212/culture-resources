@@ -61,7 +61,9 @@ app.use('/api/resources', resourceRoutes); // 挂载资源路由
 app.use('/api/users', userRoutes); // 挂载用户路由
 
 // Mount comment routes
-app.use('/api/comments', commentRoutes); // 挂载评论路由
+app.use('/api/comments', commentRoutes); // 挂载评论路由到 /api/comments
+// 为了支持 /api/resources/:id/comments 路径，再次挂载到 /api 路径
+app.use('/api', commentRoutes);
 
 // Mount favorite routes
 app.use('/api/favorites', favoriteRoutes); // 挂载收藏路由
