@@ -1,0 +1,60 @@
+# 依赖目录
+node_modules/
+*/node_modules/
+**/node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# 测试覆盖
+coverage/
+*/coverage/
+
+# 构建输出
+build/
+dist/
+.next/
+out/
+
+# 环境文件
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 日志
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# 操作系统生成的文件
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# 编辑器目录和文件
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# 其他
+.vercel
+.cache/
+.parcel-cache/
+
+# 项目特定文件
+.env.local 
