@@ -11,14 +11,14 @@ import {
   // getResourcesByUploader, // Example for a future route
   // getResourcesByCategory, // Example for a future route
 } from '../controllers/resource.controller';
-import { protect, isAdmin } from '../middleware/auth.middleware';
+import { protect, isAdmin, AuthenticatedRequest } from '../middleware/auth.middleware';
 import {
     createResourceValidationRules,
     updateResourceValidationRules,
     resourceIdValidationRules,
     validate
 } from '../validators/resource.validator';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import Resource from '../models/resource.model'; // 导入正确的Resource模型
 import { createComment, getResourceComments } from '../controllers/comment.controller';
 
@@ -66,14 +66,22 @@ router.put('/:id/check-link', protect, isAdmin, resourceIdValidationRules(), val
 router.post('/check-links', protect, isAdmin, batchCheckResourceLinks);
 
 // 获取资源的评论
-router.get('/:id/comments', (req, res, next) => {
-  console.log('[资源路由日志] GET /resources/:id/comments 命中, id:', req.params.id);
+router.get('/:id/comments', (req: Request, res: Response, next: NextFunction) => {
+  console.log('[资源路由详细日志] GET /:id/comments 命中');
+  console.log('路径参数:', req.params);
+  console.log('请求路径:', req.path);
+  console.log('请求URL:', req.originalUrl);
   return getResourceComments(req, res, next);
 });
 
 // 创建评论
-router.post('/:id/comments', (req, res, next) => {
-  console.log('[资源路由日志] POST /resources/:id/comments 命中, id:', req.params.id, 'body:', req.body);
+router.post('/:id/comments', protect, (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  console.log('[资源路由详细日志] POST /:id/comments 命中');
+  console.log('路径参数:', req.params);
+  console.log('请求路径:', req.path);
+  console.log('请求URL:', req.originalUrl);
+  console.log('请求体:', req.body);
+  console.log('用户信息:', req.user);
   return createComment(req, res, next);
 });
 

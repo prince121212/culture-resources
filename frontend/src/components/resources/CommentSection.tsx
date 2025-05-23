@@ -11,7 +11,7 @@ import { zhCN } from 'date-fns/locale';
 interface Comment {
   _id: string;
   content: string;
-  user: {
+  author: {
     _id: string;
     username: string;
     avatar?: string;
@@ -257,23 +257,23 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
-                      {comment.user.avatar ? (
+                      {comment.author.avatar ? (
                         <img
-                          src={comment.user.avatar}
-                          alt={comment.user.username}
+                          src={comment.author.avatar}
+                          alt={comment.author.username}
                           className="h-10 w-10 rounded-full"
                         />
                       ) : (
                         <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                           <span className="text-lg font-medium text-gray-500 dark:text-gray-400">
-                            {comment.user.username[0].toUpperCase()}
+                            {comment.author.username[0].toUpperCase()}
                           </span>
                         </div>
                       )}
                     </div>
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        {comment.user.username}
+                        {comment.author.username}
                       </div>
                     </div>
                   </div>
@@ -284,7 +284,7 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
                 <div className="mt-4 text-gray-700 dark:text-gray-300">
                   {comment.content}
                 </div>
-                {user?._id === comment.user._id && (
+                {user?._id === comment.author._id && (
                   <div className="mt-4 flex justify-end">
                     <button
                       onClick={() => handleDeleteComment(comment._id)}

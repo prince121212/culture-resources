@@ -21,12 +21,12 @@ export const createResourceValidationRules = () => {
       .optional()
       .trim()
       .notEmpty().withMessage('URL is required if provided')
-      .isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('URL must be a valid HTTP/HTTPS link'),
+      .matches(/^(https?):\/\//).withMessage('URL must start with http:// or https://'),
     body('link')
       .optional()
       .trim()
       .notEmpty().withMessage('Link is required if provided')
-      .isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('Link must be a valid HTTP/HTTPS link'),
+      .matches(/^(https?):\/\//).withMessage('Link must start with http:// or https://'),
     body().custom((body) => {
       if (!body.url && !body.link) {
         throw new Error('Either URL or Link field must be provided');
@@ -59,7 +59,7 @@ export const createResourceValidationRules = () => {
     body('thumbnailUrl')
       .optional({ checkFalsy: true })
       .trim()
-      .isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('Thumbnail URL must be a valid HTTP/HTTPS link'),
+      .matches(/^(https?):\/\//).withMessage('Thumbnail URL must start with http:// or https://'),
     // 'status' might be validated differently, e.g., only by admins or specific logic
   ];
 };
@@ -75,7 +75,7 @@ export const updateResourceValidationRules = () => {
     body('url')
       .optional()
       .trim()
-      .isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('URL must be a valid HTTP/HTTPS link'),
+      .matches(/^(https?):\/\//).withMessage('URL must start with http:// or https://'),
     body('description')
       .optional({ checkFalsy: true })
       .trim()
@@ -103,7 +103,7 @@ export const updateResourceValidationRules = () => {
     body('thumbnailUrl')
       .optional({ checkFalsy: true })
       .trim()
-      .isURL({ protocols: ['http', 'https'], require_protocol: true }).withMessage('Thumbnail URL must be a valid HTTP/HTTPS link'),
+      .matches(/^(https?):\/\//).withMessage('Thumbnail URL must start with http:// or https://'),
     body('status')
       .optional()
       .isIn(['draft', 'pending', 'approved', 'rejected', 'terminated']).withMessage('Invalid status value'),

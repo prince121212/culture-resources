@@ -34,7 +34,7 @@ const port = process.env.PORT || 5000;
 app.use(cors({
   origin: 'http://localhost:3000', // 允许前端开发服务器的域名
   credentials: true, // 允许携带凭证（cookies等）
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 允许的 HTTP 方法
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // 允许的 HTTP 方法
   allowedHeaders: ['Content-Type', 'Authorization'] // 允许的请求头
 }));
 
@@ -54,25 +54,23 @@ app.get('/', (req: Request, res: Response) => {
 // Mount auth routes
 app.use('/api/auth', authRoutes);
 
+// 先挂载特定路由，如评论相关的完整路径
+// 为了支持 /api/resources/:id/comments 路径
+app.use('/api', commentRoutes);
+app.use('/api', ratingRoutes); // 挂载评分路由
+
+// 再挂载其他常规路由
 // Mount resource routes
 app.use('/api/resources', resourceRoutes); // 挂载资源路由
 
 // Mount user routes
 app.use('/api/users', userRoutes); // 挂载用户路由
 
-// Mount comment routes
-app.use('/api/comments', commentRoutes); // 挂载评论路由到 /api/comments
-// 为了支持 /api/resources/:id/comments 路径，再次挂载到 /api 路径
-app.use('/api', commentRoutes);
-
 // Mount favorite routes
 app.use('/api/favorites', favoriteRoutes); // 挂载收藏路由
 
 // Mount download routes
 app.use('/api/downloads', downloadRoutes); // 挂载下载路由
-
-// Mount rating routes
-app.use('/api', ratingRoutes); // 挂载评分路由
 
 // Mount admin routes
 app.use('/api/admin', adminRoutes); // 挂载管理员路由

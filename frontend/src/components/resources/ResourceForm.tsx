@@ -14,7 +14,7 @@ interface ResourceFormProps {
 }
 
 // Basic URL validation regex
-const URL_REGEX = /^(ftp|http|https):\/\/[^ \"\\s]+$/;
+const URL_REGEX = /^(https?):\/\//;
 
 const ResourceForm: React.FC<ResourceFormProps> = ({
   onSubmit,
@@ -183,7 +183,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       setUrlError('URL不能为空。');
       isValid = false;
     } else if (!URL_REGEX.test(url.trim())) {
-      setUrlError('请输入有效的URL（例如：https://example.com）。');
+      setUrlError('请输入有效的URL（以http://或https://开头）。');
       isValid = false;
     }
 

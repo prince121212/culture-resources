@@ -24,9 +24,9 @@ export const errorHandler = (err: ErrorWithStatusCode, req: Request, res: Respon
   }
 
   // Mongoose Duplicate Key (code 11000)
-  if ((err as any).code === 11000) { // Check for MongoError code
-    const field = Object.keys((err as any).keyValue)[0];
-    message = `Duplicate field value entered for: ${field}`;
+  if ((err as any).code === 11000) {
+    const field = Object.keys((err as any).keyValue)[0]; // Check for MongoError code
+    message = `当前本站已有相同链接，请勿重复上传！ ${field}`;
     statusCode = 400;
   }
 
