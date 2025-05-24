@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import Link from 'next/link';
 import toast from 'react-hot-toast';
 
 interface Uploader {
@@ -149,7 +148,7 @@ export default function AdminReviews() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-6">资源审核</h1>
-      
+
       {loading ? (
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>

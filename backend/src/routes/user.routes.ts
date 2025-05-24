@@ -1,4 +1,4 @@
-import express, { Express, Request as ExpressRequest, Response as ExpressResponse, NextFunction as ExpressNextFunction } from 'express';
+import express, { Request as ExpressRequest, Response as ExpressResponse, NextFunction as ExpressNextFunction } from 'express';
 import {
   getUserProfile,
   updateUserProfile,
@@ -8,7 +8,7 @@ import {
   getUserStats,
   getAvatar
 } from '../controllers/user.controller';
-import { protect, AuthenticatedRequest } from '../middleware/auth.middleware';
+import { protect } from '../middleware/auth.middleware';
 import { param, body, validationResult } from 'express-validator';
 import multer from 'multer';
 

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Bars3Icon, XMarkIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
@@ -168,10 +169,13 @@ const Navbar: React.FC = () => {
                   <span className="text-sm font-medium">{user?.username}</span>
                   <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                     {user?.avatar ? (
-                      <img
+                      <Image
                         src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar`}
                         alt={user.username}
-                        className="h-full w-full object-cover"
+                        width={32}
+                        height={32}
+                        className="object-cover"
+                        style={{ width: '32px', height: '32px' }}
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
                     ) : (
@@ -273,10 +277,13 @@ const Navbar: React.FC = () => {
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                     {user?.avatar ? (
-                      <img
+                      <Image
                         src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar`}
                         alt={user.username}
-                        className="h-full w-full object-cover"
+                        width={40}
+                        height={40}
+                        className="object-cover"
+                        style={{ width: '40px', height: '40px' }}
                         onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                       />
                     ) : (

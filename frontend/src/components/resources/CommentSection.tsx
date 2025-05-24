@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { ApiError, ApiErrorData } from '@/services/auth.service';
 import toast from 'react-hot-toast';
@@ -56,11 +57,11 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/resources/${resourceId}/comments?page=${page}&limit=${commentsPerPage}`
       );
       const data: PaginatedCommentsResponse = await response.json();
-      
+
       if (!response.ok) {
         const errorDataFromServer = await response.json().catch(() => ({})); // Try to get more error details
-        const errorData: ApiErrorData = { 
-          message: `获取评论失败 (状态: ${response.status})`, 
+        const errorData: ApiErrorData = {
+          message: `获取评论失败 (状态: ${response.status})`,
           errors: response.status === 404 ? [{ msg: '找不到评论资源' }] : errorDataFromServer.errors || [{msg: response.statusText}]
         };
         console.error('Fetch comments error details:', errorDataFromServer);
@@ -123,7 +124,7 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
 
       // 尝试解析JSON，即使响应不成功，以便获取错误信息
       const data = await response.json().catch(() => ({ message: `请求失败，状态码: ${response.status}` }));
-      
+
       if (!response.ok) {
         console.error('Submit comment error details:', data);
         throw new ApiError(response.status, data.message || '提交评论失败', data);
@@ -160,7 +161,7 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/comments/${commentId}`, // 注意：删除评论的API路径与获取/创建不同
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/comments/${commentId}`,
         {
           method: 'DELETE',
           headers: {
@@ -168,7 +169,7 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
           },
         }
       );
-      
+
       const data = await response.json().catch(() => ({ message: `请求失败，状态码: ${response.status}` }));
 
       if (!response.ok) {
@@ -258,10 +259,17 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
                       {comment.author.avatar ? (
-                        <img
-                          src={comment.author.avatar}
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${comment.author._id}/avatar`}
                           alt={comment.author.username}
-                          className="h-10 w-10 rounded-full"
+                          width={40}
+                          height={40}
+                          className="rounded-full object-cover"
+                          style={{ width: '40px', height: '40px' }}
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = '/images/default-avatar.png';
+                          }}
                         />
                       ) : (
                         <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
@@ -312,4 +320,4 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
       )}
     </div>
   );
-} 
+}

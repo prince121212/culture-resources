@@ -3,6 +3,7 @@ import mongoose, { Types } from 'mongoose';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import Resource from '../models/resource.model';
 import Comment, { IComment } from '../models/comment.model';
+import User from '../models/user.model';
 
 /**
  * @desc    创建评论
@@ -207,7 +208,7 @@ export const updateComment = async (req: AuthenticatedRequest, res: Response, ne
  * @route   DELETE /api/comments/:id
  * @access  Private
  */
-export const deleteComment = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+export const deleteComment = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const commentId = req.params.id;
     const userIdString = req.user?.id;
@@ -218,13 +219,18 @@ export const deleteComment = async (req: AuthenticatedRequest, res: Response, ne
     }
 
     const comment = await Comment.findById(commentId);
+    
     if (!comment) {
       res.status(404).json({ message: '评论不存在' });
       return;
     }
 
-    // 检查是否是评论作者
-    if (comment.author.toString() !== userIdString) {
+    // 检查是否是评论作者或管理员
+    // 获取当前用户信息，检查是否是管理员
+    const currentUser = await User.findById(userIdString).select('role');
+    const isAdmin = currentUser?.role === 'admin';
+    
+    if (comment.author.toString() !== userIdString && !isAdmin) {
       res.status(403).json({ message: '没有权限删除此评论' });
       return;
     }

@@ -1,5 +1,5 @@
 import { ApiError } from './auth.service';
-import { Resource, PaginatedResourcesResponse } from './resource.service';
+import { PaginatedResourcesResponse } from './resource.service';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api';
 

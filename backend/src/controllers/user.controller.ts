@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import User from '../models/user.model';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import mongoose from 'mongoose';
-import { saveFileToGridFS, getFileById, getGridFSBucket } from '../config/gridfs';
+import { saveFileToGridFS, getGridFSBucket } from '../config/gridfs';
 
 /**
  * @desc    获取用户资料
@@ -198,8 +198,14 @@ export const getAvatar = async (req: Request, res: Response, next: NextFunction)
 
     downloadStream.on('file', (file) => {
       console.log(`[getAvatar] Streaming file: ${file.filename}, contentType: ${file.contentType}`);
-      res.set('Content-Type', file.contentType);
+
+      // 设置内容类型和缓存头部
+      res.set('Content-Type', file.contentType || 'image/jpeg');
       res.set('Content-Disposition', `inline; filename="${file.filename}"`);
+      res.set('Cache-Control', 'public, max-age=86400'); // 缓存1天
+
+      // 确保CORS头部正确设置（虽然全局中间件应该已经处理了）
+      res.set('Access-Control-Allow-Origin', '*');
     });
 
     downloadStream.on('error', (err) => {

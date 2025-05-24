@@ -1,104 +1,119 @@
-import express, { Express, Request, Response, Application } from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors'; // 添加 cors 导入
-import path from 'path'; // 添加 path 导入
+import cors from 'cors';
+import morgan from 'morgan';
+import helmet from 'helmet';
+import compression from 'compression';
 import authRoutes from './routes/auth.routes'; // 导入认证路由
 import resourceRoutes from './routes/resource.routes'; // 导入资源路由
-import userRoutes from './routes/user.routes'; // 导入用户相关路由
-import commentRoutes from './routes/comment.routes'; // 导入评论相关路由
-import favoriteRoutes from './routes/favorite.routes'; // 导入收藏相关路由
-import downloadRoutes from './routes/download.routes'; // 导入下载相关路由
-import ratingRoutes from './routes/rating.routes'; // 导入评分相关路由
-import adminRoutes from './routes/admin.routes'; // 导入管理员路由
-import notificationRoutes from './routes/notification.routes'; // 导入通知路由
+import userRoutes from './routes/user.routes'; // 导入用户路由
+import ratingRoutes from './routes/rating.routes'; // 导入评分路由
+import notificationRoutes from './routes/notification.routes'; // 导入通知
 import categoryRoutes from './routes/category.routes'; // 导入分类路由
 import tagRoutes from './routes/tag.routes'; // 导入标签路由
 import settingRoutes from './routes/setting.routes'; // 导入设置路由
 import connectDB from './config/db'; // 导入数据库连接函数
 import { errorHandler } from './middleware/error.middleware'; // 导入错误处理中间件
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { body, validationResult } from 'express-validator';
-import User from './models/user.model'; // 导入 User 模型
+import { protect, AuthenticatedRequest } from './middleware/auth.middleware'; // 导入认证中间件
+import { deleteComment } from './controllers/comment.controller'; // 导入评论控制器
 
 // For env File
 dotenv.config();
 
-// Connect to Database
+const app: Express = express();
+const port = process.env.PORT || 5001;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// 连接数据库
 connectDB();
 
-const app: Application = express();
-const port = process.env.PORT || 5001;
-
-// 添加 CORS 中间件
+// 中间件
+// CORS配置 - 允许所有来源访问头像等静态资源
 app.use(cors({
-  origin: 'http://localhost:3000', // 允许前端开发服务器的域名
-  credentials: true, // 允许携带凭证（cookies等）
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // 允许的 HTTP 方法
-  allowedHeaders: ['Content-Type', 'Authorization'] // 允许的请求头
+  origin: function (origin, callback) {
+    // 允许没有origin的请求（如移动应用、Postman等）
+    if (!origin) return callback(null, true);
+
+    // 允许localhost的所有端口
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return callback(null, true);
+    }
+
+    // 在生产环境中，这里应该检查具体的域名
+    return callback(null, true);
+  },
+  credentials: true, // 允许携带凭证
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'], // 允许的HTTP方法
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'], // 允许的请求头
+  exposedHeaders: ['Content-Type', 'Content-Length', 'Content-Disposition', 'Cache-Control'] // 暴露给前端的响应头
 }));
 
-// Middleware to parse JSON bodies
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// 添加静态文件服务
-// app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+// 安全中间件配置
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // 允许跨域资源
+  crossOriginEmbedderPolicy: false // 禁用COEP以避免图片加载问题
+}));
 
-// 添加请求日志中间件
-app.use((req: Request, res: Response, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
-  if (req.url.includes('/avatar')) {
-    console.log(`[AVATAR REQUEST] ${req.method} ${req.url} - Content-Type: ${req.headers['content-type']}`);
-  }
+app.use(compression());
+
+// 日志中间件
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
+// 添加简单的请求日志中间件
+app.use((req: Request, _res: Response, next: NextFunction) => {
+  console.log(`${req.method} ${req.url}`);
   next();
 });
 
-app.get('/', (req: Request, res: Response) => {
+app.get('/', (_req: Request, res: Response) => {
   res.send('Welcome to Express & TypeScript Server for Resource Sharing Platform');
 });
 
 // Mount auth routes
 app.use('/api/auth', authRoutes);
 
-// 先挂载特定路由，如评论相关的完整路径
-// 为了支持 /api/resources/:id/comments 路径
-app.use('/api', commentRoutes);
+// 分别挂载评论路由的不同部分
+// 资源评论相关路由
+app.use('/api/resources', resourceRoutes); // 挂载资源路由
+
+// 评论操作相关路由（删除、更新、点赞等）
+app.delete('/api/comments/:id', protect, (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  return deleteComment(req, res, next);
+});
+
+// 评分相关路由
 app.use('/api', ratingRoutes); // 挂载评分路由
 
 // 再挂载其他常规路由
-// Mount resource routes
-app.use('/api/resources', resourceRoutes); // 挂载资源路由
-
 // Mount user routes
 app.use('/api/users', userRoutes); // 挂载用户路由
 
-// Mount favorite routes
-app.use('/api/favorites', favoriteRoutes); // 挂载收藏路由
-
-// Mount download routes
-app.use('/api/downloads', downloadRoutes); // 挂载下载路由
-
-// Mount admin routes
-app.use('/api/admin', adminRoutes); // 挂载管理员路由
-
-// Mount notification routes
-app.use('/api/notifications', notificationRoutes); // 挂载通知路由
-
-// Mount category routes
+// 挂载其他路由
 app.use('/api/categories', categoryRoutes); // 挂载分类路由
-
-// Mount tag routes
 app.use('/api/tags', tagRoutes); // 挂载标签路由
-
-// Mount setting routes
+app.use('/api/notifications', notificationRoutes); // 挂载通知路由
 app.use('/api/settings', settingRoutes); // 挂载设置路由
 
-// Error Handling Middleware (must be last)
+// 使用错误处理中间件
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`🚀 Server running on port ${port}`);
-  console.log(`🌐 API available at: http://localhost:${port}/api`);
-  console.log(`👤 Avatar upload endpoint: http://localhost:${port}/api/users/:id/avatar`);
+  console.log(`⚡️[server]: Server is running at http://localhost:${port} in ${NODE_ENV} mode`);
+});
+
+// 处理未捕获的异常
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+// 处理未处理的Promise拒绝
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled Rejection:', error);
+  process.exit(1);
 });

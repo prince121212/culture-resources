@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import User, { IUser } from '../models/user.model'; // 导入User模型
-import mongoose from 'mongoose';
+import User from '../models/user.model';
+
 
 dotenv.config();
 
@@ -17,37 +17,31 @@ if (!JWT_SECRET) {
 
 // Extend Express Request interface to include user payload from JWT
 export interface AuthenticatedRequest extends Request {
-  user?: { id: string; role: string }; // Or a more detailed IUserPayload
+  user?: {
+    id: string;
+    role: string;
+  };
 }
 
-export const protect = (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+/**
+ * 验证用户Token
+ * 在需要认证的路由前添加此中间件
+ */
+export const protect = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   let token;
 
+  // 检查headers中的authorization
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      // 在验证之前打印收到的Token和JWT_SECRET，用于调试
-      console.log('[DEBUG] Token received for verification:', token);
-      console.log('[DEBUG] JWT_SECRET used for verification:', JWT_SECRET);
-      
+
       const decoded = jwt.verify(token, JWT_SECRET!) as { id: string; role: string; iat: number; exp: number };
 
       // Attach user info to request object
-      // 실제로는 decoded.id로 DB에서 사용자 정보를 조회해서 req.user에 할당하는 것이 좋음
-      // 여기서는 단순화를 위해 decoded payload를 그대로 사용
       req.user = { id: decoded.id, role: decoded.role };
       next();
       return;
-    } catch (error: any) { // 将 error 类型改为 any 以便访问其属性
-      // 添加更明确的日志
-      console.error('-----------------------------------------------------');
-      console.error('[AUTH ERROR] Token verification FAILED. Details below:');
-      console.error('[AUTH ERROR] Raw Token String:', token); // 打印原始token
-      console.error('[AUTH ERROR] Error Name:', error.name);
-      console.error('[AUTH ERROR] Error Message:', error.message);
-      console.error('[AUTH ERROR] Full Error Object:', JSON.stringify(error, null, 2));
-      console.error('-----------------------------------------------------');
-      
+    } catch (error: any) {
       res.status(401).json({ message: 'Not authorized, token failed' });
       return;
     }
@@ -56,6 +50,18 @@ export const protect = (req: AuthenticatedRequest, res: Response, next: NextFunc
   if (!token) {
     res.status(401).json({ message: 'Not authorized, no token' });
     return;
+  }
+};
+
+/**
+ * 验证用户是否为管理员
+ * 在需要管理员权限的路由前添加此中间件
+ */
+export const admin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized as an admin' });
   }
 };
 
@@ -93,7 +99,7 @@ export const checkPermission = (permission: string) => {
       return;
     }
     // 假设Role模型也会从其定义文件导入，如果存在的话
-    // const Role = mongoose.model('Role'); 
+    // const Role = mongoose.model('Role');
     // const role = await Role.findOne({ name: (user as any).role });
     // 为了避免潜在的Role模型重复定义，暂时注释掉上面两行，
     // 并假设user对象上直接有permissions字段或通过role关联的permissions

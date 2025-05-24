@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
+import Image from 'next/image';
 import {
   HeartIcon,
   ChatBubbleLeftIcon,
@@ -11,17 +12,14 @@ import {
 } from '@heroicons/react/24/outline';
 import {
   HeartIcon as HeartIconSolid,
-  ChatBubbleLeftIcon as ChatBubbleLeftIconSolid,
 } from '@heroicons/react/24/solid';
 import {
   getComments,
   createComment,
-  updateComment,
   deleteComment,
   toggleCommentLike,
   reportComment,
   Comment,
-  CommentAuthor,
 } from '@/services/comment.service';
 import { ApiError } from '@/services/auth.service';
 
@@ -241,10 +239,13 @@ export default function CommentSection({
         }`}
       >
         <div className="flex items-start space-x-3">
-          <img
-            src={comment.author.avatar || '/images/default-avatar.jpg'}
+          <Image
+            src={comment.author.avatar ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${comment.author._id}/avatar` : '/images/default-avatar.jpg'}
             alt={comment.author.username}
-            className="w-10 h-10 rounded-full"
+            width={40}
+            height={40}
+            className="rounded-full object-cover"
+            style={{ width: '40px', height: '40px' }}
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = '/images/default-avatar.jpg';
@@ -340,10 +341,13 @@ export default function CommentSection({
       {currentUser ? (
         <form onSubmit={handleSubmitComment} className="mb-8">
           <div className="flex items-start space-x-3">
-            <img
-              src={currentUser.avatar || '/images/default-avatar.jpg'}
+            <Image
+              src={currentUser.avatar ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar` : '/images/default-avatar.jpg'}
               alt={currentUser.username}
-              className="w-10 h-10 rounded-full"
+              width={40}
+              height={40}
+              className="rounded-full object-cover"
+              style={{ width: '40px', height: '40px' }}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = '/images/default-avatar.jpg';
@@ -434,4 +438,4 @@ export default function CommentSection({
       </div>
     </div>
   );
-} 
+}

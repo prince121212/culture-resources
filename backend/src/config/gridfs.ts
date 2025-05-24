@@ -10,7 +10,7 @@ export const initGridFS = (connection: mongoose.Connection) => {
   if (!connection.db) {
     throw new Error('Database connection not established');
   }
-  
+
   gridFSBucket = new GridFSBucket(connection.db, {
     bucketName: 'uploads'
   });
@@ -30,9 +30,9 @@ export const getGridFSBucket = () => {
 export const storage = multer.memoryStorage();
 
 // 文件过滤器
-export const fileFilter = (req: Request, file: Express.Multer.File, callback: multer.FileFilterCallback) => {
+export const fileFilter = (_req: Request, file: Express.Multer.File, callback: multer.FileFilterCallback) => {
   const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-  
+
   if (allowedMimeTypes.includes(file.mimetype)) {
     callback(null, true);
   } else {
@@ -41,7 +41,7 @@ export const fileFilter = (req: Request, file: Express.Multer.File, callback: mu
 };
 
 // 配置Multer中间件
-export const upload = multer({ 
+export const upload = multer({
   storage,
   limits: {
     fileSize: 2 * 1024 * 1024 // 2MB
@@ -58,7 +58,7 @@ export const getFileById = async (id: string) => {
   return new Promise((resolve, reject) => {
     try {
       const downloadStream = gridFSBucket.openDownloadStream(new mongoose.Types.ObjectId(id));
-      
+
       downloadStream.on('error', (error) => {
         reject(error);
       });
@@ -72,7 +72,7 @@ export const getFileById = async (id: string) => {
 
 // 保存文件到GridFS并返回文件ID
 export const saveFileToGridFS = async (
-  file: Express.Multer.File, 
+  file: Express.Multer.File,
   metadata: object = {}
 ): Promise<mongoose.Types.ObjectId> => {
   return new Promise((resolve, reject) => {
@@ -97,4 +97,4 @@ export const saveFileToGridFS = async (
       reject(error);
     }
   });
-}; 
+};

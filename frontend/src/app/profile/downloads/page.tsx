@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { getDownloadHistory, Resource, PaginatedResourcesResponse } from '@/services/resource.service';
+import { Resource, PaginatedResourcesResponse } from '@/services/resource.service';
+import { getDownloadHistory } from '@/services/download.service';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { ApiError } from '@/services/auth.service';
 
@@ -68,6 +69,12 @@ export default function DownloadsPage() {
           &larr; 返回个人中心
         </Link>
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">下载历史</h1>
+        <button
+          onClick={() => setRefreshKey(prev => prev + 1)}
+          className="ml-4 px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600"
+        >
+          刷新
+        </button>
       </div>
 
       <div className="mt-6">
