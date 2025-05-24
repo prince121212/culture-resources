@@ -9,7 +9,7 @@ const Auth = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/register', { username, password });
+      await axios.post('http://localhost:5001/api/register', { username, password });
       setMessage('用户注册成功');
     } catch {
       setMessage('用户注册失败，请重试。');
@@ -19,8 +19,8 @@ const Auth = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/login', { username, password });
-      setMessage('登录成功');
+      const response = await axios.post('http://localhost:5001/api/login', { username, password });
+      setMessage('登录成功2323');
     } catch {
       setMessage('登录失败，请重试。');
     }

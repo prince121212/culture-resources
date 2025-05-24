@@ -41,7 +41,7 @@ export default function UserManagement() {
   const fetchUsers = async (page = 1) => {
     try {
       setLoading(true);
-      let url = `http://localhost:5000/api/admin/users?page=${page}&limit=10`;
+      let url = `http://localhost:5001/api/admin/users?page=${page}&limit=10`;
       
       if (searchQuery) {
         url += `&keyword=${encodeURIComponent(searchQuery)}`;
@@ -95,7 +95,7 @@ export default function UserManagement() {
     if (!editingUser || !newRole) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/users/${editingUser._id}/role`, {
+      const response = await fetch(`http://localhost:5001/api/admin/users/${editingUser._id}/role`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

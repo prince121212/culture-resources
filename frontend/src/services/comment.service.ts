@@ -49,7 +49,7 @@ export interface PaginatedCommentsResponse {
   };
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api';
 
 // 获取评论列表
 export async function getComments(
@@ -208,4 +208,4 @@ export async function reportComment(
       { message: error.message || '举报失败', errors: error.errors }
     );
   }
-} 
+}

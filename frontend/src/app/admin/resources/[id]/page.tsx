@@ -46,7 +46,7 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
     const fetchResource = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/resources/${params.id}`, {
+        const response = await fetch(`http://localhost:5001/api/resources/${params.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -110,7 +110,7 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
 
     try {
       setCheckingLink(true);
-      const response = await fetch(`http://localhost:5000/api/resources/${resource._id}/check-link`, {
+      const response = await fetch(`http://localhost:5001/api/resources/${resource._id}/check-link`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -129,7 +129,7 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
       } else {
         toast.error('链接检查完成：链接已失效');
         // 刷新资源信息
-        const updatedResource = await fetch(`http://localhost:5000/api/resources/${resource._id}`, {
+        const updatedResource = await fetch(`http://localhost:5001/api/resources/${resource._id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

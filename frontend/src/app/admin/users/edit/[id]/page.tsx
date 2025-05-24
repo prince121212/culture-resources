@@ -37,7 +37,7 @@ export default function EditUser() {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/users/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -82,7 +82,7 @@ export default function EditUser() {
     
     try {
       setSaving(true);
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      const response = await fetch(`http://localhost:5001/api/admin/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

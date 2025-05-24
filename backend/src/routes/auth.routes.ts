@@ -105,10 +105,11 @@ router.post('/login', [
     });
 
     res.json({
-      message: '登录成功',
+      message: '登录成功11133333333333333111',
       token,
       user: userResponse
     });
+    console.log('Login successful for user11111112:');
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: '服务器错误' });

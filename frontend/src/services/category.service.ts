@@ -10,7 +10,7 @@ export interface Category {
   updatedAt?: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api';
 
 /**
  * 获取所有分类
@@ -124,4 +124,4 @@ export const deleteCategory = async (id: string): Promise<void> => {
     }
     throw new ApiError(500, '删除分类失败', { message: '删除分类失败' });
   }
-}; 
+};

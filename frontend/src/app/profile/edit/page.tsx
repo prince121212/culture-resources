@@ -6,7 +6,6 @@ import { useAuth } from '@/context/AuthContext';
 import { updateUserProfile, UpdateUserProfileData } from '@/services/user.service';
 import { ApiError, ValidationError } from '@/services/auth.service';
 import toast from 'react-hot-toast';
-import Image from 'next/image';
 import Link from 'next/link';
 
 export default function EditProfilePage() {
@@ -28,7 +27,13 @@ export default function EditProfilePage() {
     if (currentUser) {
       setUsername(currentUser.username || '');
       setEmail(currentUser.email || '');
-      setAvatar(currentUser.avatar || null);
+      if (currentUser.avatar && currentUser.avatar.startsWith('/api/users/')) {
+        setAvatar(currentUser.avatar);
+      } else if (currentUser.avatar) {
+        setAvatar(`/api/users/${currentUser._id}/avatar`);
+      } else {
+        setAvatar(null);
+      }
     }
   }, [currentUser]);
 
@@ -79,15 +84,15 @@ export default function EditProfilePage() {
       const updatedUser = await updateUserProfile(currentUser._id, updateData, token);
 
       // 更新头像（如果有新头像）
-      // 注意：由于后端可能尚未完全实现头像上传API，这里暂时注释掉
-      // 实际项目中应该取消注释并实现这部分功能
-      /*
       if (avatarFile) {
         try {
           const formData = new FormData();
           formData.append('avatar', avatarFile);
 
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${currentUser._id}/avatar`, {
+          console.log(`准备上传头像: ${avatarFile.name}, 大小: ${Math.round(avatarFile.size / 1024)}KB, 类型: ${avatarFile.type}`);
+
+          // 使用正确的头像上传API
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${token}`,
@@ -95,18 +100,25 @@ export default function EditProfilePage() {
             body: formData,
           });
 
+          console.log(`头像上传响应状态: ${response.status}`);
+
           if (!response.ok) {
-            throw new Error('头像上传失败');
+            const errorData = await response.json().catch(() => ({ message: '头像上传响应解析失败' }));
+            throw new Error(errorData.message || '头像上传失败');
           }
 
           const data = await response.json();
-          updatedUser.avatar = data.avatarUrl;
+          console.log(`头像上传成功, 返回数据:`, data);
+
+          // 更新用户头像信息
+          if (data.user) {
+            updatedUser.avatar = data.user.avatar;
+          }
         } catch (error) {
           console.error('头像上传失败:', error);
-          toast.error('头像上传失败，但其他资料已更新');
+          toast.error(error instanceof Error ? error.message : '头像上传失败，但其他资料已更新');
         }
       }
-      */
 
       // 更新全局用户上下文
       if (updateUserContext) {
@@ -137,8 +149,8 @@ export default function EditProfilePage() {
 
   // 获取特定字段的验证错误
   const getFieldError = (field: string): string | undefined => {
-    const error = validationErrors.find(err => err.field === field);
-    return error?.message;
+    const error = validationErrors.find(err => err.path === field);
+    return error?.msg;
   };
 
   if (authLoading || !currentUser) {
@@ -177,12 +189,20 @@ export default function EditProfilePage() {
             <div className="flex items-center">
               <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mr-4">
                 {(avatarPreview || avatar) ? (
-                  <Image
-                    src={avatarPreview || avatar || '/images/default-avatar.png'}
-                    alt="用户头像"
-                    fill
-                    className="object-cover"
-                  />
+                  avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="用户头像预览"
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <img
+                      src={currentUser?.avatar ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar` : '/images/default-avatar.png'}
+                      alt="用户头像"
+                      className="object-cover w-full h-full"
+                      onError={(e) => { (e.target as HTMLImageElement).src = '/images/default-avatar.png'; }}
+                    />
+                  )
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-500">
                     无头像

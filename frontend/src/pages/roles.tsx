@@ -16,7 +16,7 @@ const Roles = () => {
   const handleAddRole = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/roles', { name, permissions: permissions.split(',') });
+      await axios.post('http://localhost:5001/api/roles', { name, permissions: permissions.split(',') });
       setMessage('角色添加成功');
       fetchRoles();
     } catch {
@@ -26,7 +26,7 @@ const Roles = () => {
 
   const fetchRoles = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/roles');
+      const response = await axios.get('http://localhost:5001/api/roles');
       setRoles(response.data);
     } catch {
       setMessage('获取角色失败，请重试。');

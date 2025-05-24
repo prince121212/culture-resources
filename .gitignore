@@ -57,4 +57,13 @@ next-env.d.ts
 .parcel-cache/
 
 # 项目特定文件
-.env.local 
+.env.local
+
+# uploads文件
+/uploads
+/backend/uploads/
+/backend/uploads/avatars/
+
+# 忽略uploads目录下的所有文件
+backend/uploads/
+uploads/ 

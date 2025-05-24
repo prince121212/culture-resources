@@ -10,6 +10,7 @@ export interface IUser extends Document {
   role: string;
   points: number;
   status: string;
+  avatar?: string; // 添加头像字段
   createdAt?: Date;
   updatedAt?: Date;
   matchPassword(enteredPassword: string): Promise<boolean>; // Add method to interface
@@ -47,6 +48,10 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
       type: String,
       enum: ['active', 'inactive', 'banned'],
       default: 'active',
+    },
+    avatar: {
+      type: String,
+      default: null,
     },
   },
   {

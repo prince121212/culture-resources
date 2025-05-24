@@ -29,7 +29,7 @@ export default function LoginPage() {
       const credentials: UserCredentials = { email, password };
       await auth.login(credentials);
 
-      toast.success('登录成功!');
+      toast.success('登录成功!'); // 前端提示成功
       router.push('/');
 
     } catch (error: unknown) {

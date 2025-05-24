@@ -45,7 +45,7 @@ export default function CategoryEdit() {
         setLoading(true);
         
         // 获取当前分类
-        const categoryResponse = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+        const categoryResponse = await fetch(`http://localhost:5001/api/categories/${categoryId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -66,7 +66,7 @@ export default function CategoryEdit() {
         });
         
         // 获取所有分类（用于选择父分类）
-        const categoriesResponse = await fetch(`http://localhost:5000/api/categories?flat=true`, {
+        const categoriesResponse = await fetch(`http://localhost:5001/api/categories?flat=true`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -122,7 +122,7 @@ export default function CategoryEdit() {
     
     try {
       setSaving(true);
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+      const response = await fetch(`http://localhost:5001/api/categories/${categoryId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -147,7 +147,7 @@ export default function CategoryEdit() {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+      const response = await fetch(`http://localhost:5001/api/categories/${categoryId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,22 +1,43 @@
-import express, { Express } from 'express';
+import express, { Express, Request as ExpressRequest, Response as ExpressResponse, NextFunction as ExpressNextFunction } from 'express';
 import {
   getUserProfile,
   updateUserProfile,
   uploadAvatar,
   getUserUploads,
   getUserFavorites,
-  getUserStats
+  getUserStats,
+  getAvatar
 } from '../controllers/user.controller';
 import { protect, AuthenticatedRequest } from '../middleware/auth.middleware';
 import { param, body, validationResult } from 'express-validator';
-import { Request, Response, NextFunction } from 'express';
-import multer, { FileFilterCallback } from 'multer';
-import path from 'path';
+import multer from 'multer';
+
+// 创建内存存储配置
+const memoryStorage = multer.memoryStorage();
+
+// 创建 multer 实例，明确使用 memoryStorage
+const memoryUpload = multer({
+  storage: memoryStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit for testing
+  },
+  fileFilter: (_req, file, cb) => {
+    console.log(`[multer] Processing file: ${file.originalname}, mimetype: ${file.mimetype}`);
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      console.log(`[multer] File type accepted: ${file.mimetype}`);
+      cb(null, true);
+    } else {
+      console.log(`[multer] File type rejected: ${file.mimetype}`);
+      cb(new Error('不支持的文件类型: ' + file.mimetype));
+    }
+  }
+});
 
 const router = express.Router();
 
 // 验证中间件
-const validate = (req: Request, res: Response, next: NextFunction): void => {
+const validate = (req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(400).json({ errors: errors.array() });
@@ -47,31 +68,7 @@ const userProfileUpdateValidationRules = () => [
     .withMessage('请提供有效的邮箱地址'),
 ];
 
-// 配置文件上传
-const storage = multer.diskStorage({
-  destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-    cb(null, 'uploads/avatars');
-  },
-  filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + path.extname(file.originalname));
-  }
-});
 
-const upload = multer({
-  storage,
-  limits: {
-    fileSize: 2 * 1024 * 1024, // 限制2MB
-  },
-  fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (allowedMimeTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('只允许上传图片文件 (JPEG, PNG, GIF, WebP)') as any);
-    }
-  }
-});
 
 // 获取用户资料
 router.get('/profile/:id', userIdValidationRules(), validate, getUserProfile);
@@ -92,9 +89,12 @@ router.post(
   protect,
   userIdValidationRules(),
   validate,
-  upload.single('avatar'),
+  memoryUpload.single('avatar'),
   uploadAvatar
 );
+
+// 获取用户头像
+router.get('/:id/avatar', getAvatar);
 
 // 获取用户上传的资源
 router.get('/uploads/:userId', userIdValidationRules(), validate, getUserUploads);

@@ -45,7 +45,7 @@ export default function UserResources() {
   const fetchResources = async (page = 1) => {
     try {
       setLoading(true);
-      let url = `http://localhost:5000/api/admin/users/${userId}/resources?page=${page}&limit=10`;
+      let url = `http://localhost:5001/api/admin/users/${userId}/resources?page=${page}&limit=10`;
 
       if (statusFilter !== 'all') {
         url += `&status=${statusFilter}`;
@@ -67,7 +67,7 @@ export default function UserResources() {
 
       // 如果是第一次加载，获取用户名
       if (!username) {
-        const userResponse = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+        const userResponse = await fetch(`http://localhost:5001/api/admin/users/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

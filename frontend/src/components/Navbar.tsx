@@ -16,12 +16,12 @@ const Navbar: React.FC = () => {
   // 组件挂载后执行
   useEffect(() => {
     setMounted(true);
-    
+
     try {
       // 检查本地存储中是否有用户主题偏好设置
       const savedTheme = localStorage.getItem('theme');
       console.log('当前保存的主题:', savedTheme);
-      
+
       if (savedTheme === 'dark') {
         setIsDarkMode(true);
         document.documentElement.classList.add('dark');
@@ -54,7 +54,7 @@ const Navbar: React.FC = () => {
       const newDarkMode = !isDarkMode;
       console.log('切换主题:', newDarkMode ? 'dark' : 'light');
       setIsDarkMode(newDarkMode);
-      
+
       if (newDarkMode) {
         document.documentElement.classList.add('dark');
         localStorage.setItem('theme', 'dark');
@@ -66,11 +66,11 @@ const Navbar: React.FC = () => {
       console.error('切换主题出错:', error);
     }
   };
-  
+
   // 在组件挂载前不渲染主题切换按钮，避免水合不匹配
   const ThemeToggle = () => {
     if (!mounted) return null;
-    
+
     return (
       <button
         onClick={toggleDarkMode}
@@ -89,7 +89,7 @@ const Navbar: React.FC = () => {
   // 移动端主题切换按钮
   const MobileThemeToggle = () => {
     if (!mounted) return null;
-    
+
     return (
       <div className="flex items-center pl-3 pr-4 py-2">
         <button
@@ -166,10 +166,19 @@ const Navbar: React.FC = () => {
                   className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
                 >
                   <span className="text-sm font-medium">{user?.username}</span>
-                  <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                      {user?.username ? user.username[0].toUpperCase() : '?'}
-                    </span>
+                  <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                    {user?.avatar ? (
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar`}
+                        alt={user.username}
+                        className="h-full w-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {user?.username ? user.username[0].toUpperCase() : '?'}
+                      </span>
+                    )}
                   </div>
                 </button>
 
@@ -252,7 +261,7 @@ const Navbar: React.FC = () => {
                 {link.label}
               </Link>
             ))}
-            
+
             {/* 移动端主题切换按钮 */}
             <MobileThemeToggle />
           </div>
@@ -262,10 +271,19 @@ const Navbar: React.FC = () => {
             <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center px-4">
                 <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                      {user?.username ? user.username[0].toUpperCase() : '?'}
-                    </span>
+                  <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                    {user?.avatar ? (
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar`}
+                        alt={user.username}
+                        className="h-full w-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                      />
+                    ) : (
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                        {user?.username ? user.username[0].toUpperCase() : '?'}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="ml-3">

@@ -1,6 +1,6 @@
 import { ApiError } from './auth.service';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api';
 
 // 设置类型枚举
 export enum SettingType {
@@ -59,29 +59,29 @@ export interface GroupedSettings {
 export const getSettings = async (token?: string, group?: string): Promise<GroupedSettings> => {
   try {
     const url = new URL(`${API_BASE_URL}/settings`);
-    
+
     if (group) {
       url.searchParams.append('group', group);
     }
-    
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers,
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new ApiError(response.status, errorData.message || '获取设置失败');
     }
-    
+
     return await response.json();
   } catch (error) {
     if (error instanceof ApiError) {
@@ -102,21 +102,21 @@ export const getSettingByKey = async (key: string, token?: string): Promise<Sett
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
-    
+
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     const response = await fetch(`${API_BASE_URL}/settings/${key}`, {
       method: 'GET',
       headers,
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new ApiError(response.status, errorData.message || '获取设置失败');
     }
-    
+
     return await response.json();
   } catch (error) {
     if (error instanceof ApiError) {
@@ -143,12 +143,12 @@ export const updateSetting = async (key: string, value: any, token: string): Pro
       },
       body: JSON.stringify({ value }),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new ApiError(response.status, errorData.message || '更新设置失败');
     }
-    
+
     const data = await response.json();
     return data.data;
   } catch (error) {
@@ -175,12 +175,12 @@ export const updateSettings = async (settings: { key: string; value: any }[], to
       },
       body: JSON.stringify({ settings }),
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new ApiError(response.status, errorData.message || '批量更新设置失败');
     }
-    
+
     return await response.json();
   } catch (error) {
     if (error instanceof ApiError) {
@@ -204,12 +204,12 @@ export const initializeSettings = async (token: string): Promise<any> => {
         'Authorization': `Bearer ${token}`,
       },
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new ApiError(response.status, errorData.message || '初始化设置失败');
     }
-    
+
     return await response.json();
   } catch (error) {
     if (error instanceof ApiError) {

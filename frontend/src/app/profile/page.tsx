@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
+// import Image from 'next/image'; //不再需要
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -74,11 +74,11 @@ export default function ProfilePage() {
         <div className="flex items-center mb-6">
           <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mr-4">
             {currentUser.avatar ? (
-              <Image
-                src={currentUser.avatar}
+              <img
+                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar`}
                 alt="用户头像"
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default-avatar.png'; }}
               />
             ) : (
               <div className="flex items-center justify-center h-full text-gray-500">

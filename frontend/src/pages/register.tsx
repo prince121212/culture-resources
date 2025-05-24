@@ -10,7 +10,7 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/register', { username, email, password });
+      const response = await axios.post('http://localhost:5001/register', { username, email, password });
       setMessage(response.data.message);
     } catch (error) {
       setMessage('注册失败，请重试。');

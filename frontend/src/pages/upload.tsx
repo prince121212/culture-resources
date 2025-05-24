@@ -13,7 +13,7 @@ const Upload = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/resources/upload', { title, description, url, type, category, tags });
+      const response = await axios.post('http://localhost:5001/api/resources/upload', { title, description, url, type, category, tags });
       setMessage(response.data.message);
     } catch {
       setMessage('上传失败，请重试。');
@@ -37,4 +37,4 @@ const Upload = () => {
   );
 };
 
-export default Upload; 
+export default Upload;

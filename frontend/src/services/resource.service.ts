@@ -1,6 +1,6 @@
 import { ApiError, ApiErrorData } from './auth.service'; // Reuse ApiError or create a more generic one
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api';
 
 // Interfaces
 export interface Uploader {
@@ -106,7 +106,7 @@ export const createResource = async (resourceData: CreateResourceData, token: st
     console.log('Creating resource with data:', resourceData);
     console.log('API URL:', `${API_BASE_URL}/resources`);
     console.log('Using token:', token ? 'Token exists' : 'No token');
-    
+
     const response = await fetch(`${API_BASE_URL}/resources`, {
       method: 'POST',
       headers: {
@@ -115,7 +115,7 @@ export const createResource = async (resourceData: CreateResourceData, token: st
       },
       body: JSON.stringify(resourceData),
     });
-    
+
     const data = await response.json();
     console.log('API Response:', response.status, data);
 
@@ -198,4 +198,22 @@ export const incrementDownloadCount = async (resourceId: string): Promise<void> 
     // Optionally, re-throw if the caller needs to handle this.
     // if (error instanceof ApiError) throw error; else throw new Error('Network error during download count increment');
   }
+};
+
+/**
+ * Fetches user's favorite resources.
+ * Requires authentication token.
+ */
+export const getFavoriteResources = async (token: string): Promise<Resource[]> => {
+  const response = await fetch(`${API_BASE_URL}/favorites`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new ApiError(response.status, 'Failed to fetch favorite resources', data as ApiErrorData);
+  }
+  return data as Resource[];
 };

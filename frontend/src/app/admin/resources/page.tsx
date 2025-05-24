@@ -50,7 +50,7 @@ export default function AdminResources() {
   const fetchResources = async (page = 1) => {
     try {
       setLoading(true);
-      let url = `http://localhost:5000/api/resources?page=${page}&limit=10`;
+      let url = `http://localhost:5001/api/resources?page=${page}&limit=10`;
 
       if (searchQuery) {
         url += `&keyword=${encodeURIComponent(searchQuery)}`;

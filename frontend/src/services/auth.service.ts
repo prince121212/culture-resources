@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api';
 
 export interface UserCredentials {
   email: string;
@@ -30,7 +30,7 @@ export interface ValidationError {
   location?: string; // e.g., body, query, params
   value?: unknown;     // Changed from any to unknown
   // For nested errors, though less common for simple validation
-  // nested_errors?: ValidationError[]; 
+  // nested_errors?: ValidationError[];
 }
 
 export interface AuthResponse {
@@ -89,4 +89,4 @@ export const login = async (credentials: UserCredentials): Promise<AuthResponse>
     throw new ApiError(response.status, data.message || 'Login failed', data as ApiErrorData);
   }
   return data as AuthResponse;
-}; 
+};

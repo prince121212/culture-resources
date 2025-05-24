@@ -32,7 +32,7 @@ export default function TagManagement() {
   const fetchTags = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/tags`, {
+      const response = await fetch(`http://localhost:5001/api/tags`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -66,7 +66,7 @@ export default function TagManagement() {
   const handleAddTag = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/tags', {
+      const response = await fetch('http://localhost:5001/api/tags', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ export default function TagManagement() {
     if (!currentTag) return;
     
     try {
-      const response = await fetch(`http://localhost:5000/api/tags/${currentTag._id}`, {
+      const response = await fetch(`http://localhost:5001/api/tags/${currentTag._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -126,7 +126,7 @@ export default function TagManagement() {
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/tags/${id}`, {
+      const response = await fetch(`http://localhost:5001/api/tags/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -149,7 +149,7 @@ export default function TagManagement() {
 
   const handleDeleteTag = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/tags/${id}`, {
+      const response = await fetch(`http://localhost:5001/api/tags/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

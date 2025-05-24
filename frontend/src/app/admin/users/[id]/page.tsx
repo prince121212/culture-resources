@@ -47,7 +47,7 @@ export default function UserDetail() {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/users/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -61,7 +61,7 @@ export default function UserDetail() {
         setUser(data);
         
         // 获取用户统计数据
-        const statsResponse = await fetch(`http://localhost:5000/api/admin/users/${userId}/stats`, {
+        const statsResponse = await fetch(`http://localhost:5001/api/admin/users/${userId}/stats`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -87,7 +87,7 @@ export default function UserDetail() {
   const handleStatusChange = async (newStatus: string) => {
     try {
       setStatusLoading(true);
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/status`, {
+      const response = await fetch(`http://localhost:5001/api/admin/users/${userId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -8,7 +8,7 @@ const Download = () => {
   const handleDownload = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.get(`http://localhost:5000/api/download/${resourceId}`);
+      const response = await axios.get(`http://localhost:5001/api/download/${resourceId}`);
       window.location.href = response.request.responseURL;
     } catch {
       setMessage('下载失败，请重试。');

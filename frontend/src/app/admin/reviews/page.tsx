@@ -47,7 +47,7 @@ export default function AdminReviews() {
   const fetchPendingResources = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/admin/resources/pending?page=${page}&limit=10`, {
+      const response = await fetch(`http://localhost:5001/api/admin/resources/pending?page=${page}&limit=10`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -80,7 +80,7 @@ export default function AdminReviews() {
 
   const handleApprove = async (resource: Resource) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/resources/${resource._id}/review`, {
+      const response = await fetch(`http://localhost:5001/api/admin/resources/${resource._id}/review`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ export default function AdminReviews() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/resources/${reviewingResource._id}/review`, {
+      const response = await fetch(`http://localhost:5001/api/admin/resources/${reviewingResource._id}/review`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

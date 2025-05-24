@@ -12,7 +12,7 @@ const Comments = () => {
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/comments', { resource: resourceId, user: userId, content, rating });
+      await axios.post('http://localhost:5001/api/comments', { resource: resourceId, user: userId, content, rating });
       setMessage('评论添加成功');
       fetchComments();
     } catch {
@@ -22,7 +22,7 @@ const Comments = () => {
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/comments/${resourceId}`);
+      const response = await axios.get(`http://localhost:5001/api/comments/${resourceId}`);
       setComments(response.data);
     } catch {
       setMessage('获取评论失败，请重试。');

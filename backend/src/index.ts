@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, Application } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors'; // 添加 cors 导入
+import path from 'path'; // 添加 path 导入
 import authRoutes from './routes/auth.routes'; // 导入认证路由
 import resourceRoutes from './routes/resource.routes'; // 导入资源路由
 import userRoutes from './routes/user.routes'; // 导入用户相关路由
@@ -28,7 +29,7 @@ dotenv.config();
 connectDB();
 
 const app: Application = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 // 添加 CORS 中间件
 app.use(cors({
@@ -41,9 +42,15 @@ app.use(cors({
 // Middleware to parse JSON bodies
 app.use(express.json());
 
+// 添加静态文件服务
+// app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+
 // 添加请求日志中间件
 app.use((req: Request, res: Response, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  if (req.url.includes('/avatar')) {
+    console.log(`[AVATAR REQUEST] ${req.method} ${req.url} - Content-Type: ${req.headers['content-type']}`);
+  }
   next();
 });
 
@@ -91,5 +98,7 @@ app.use('/api/settings', settingRoutes); // 挂载设置路由
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  console.log(`🚀 Server running on port ${port}`);
+  console.log(`🌐 API available at: http://localhost:${port}/api`);
+  console.log(`👤 Avatar upload endpoint: http://localhost:${port}/api/users/:id/avatar`);
 });

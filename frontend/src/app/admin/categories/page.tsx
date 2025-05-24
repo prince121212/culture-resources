@@ -36,7 +36,7 @@ export default function CategoryManagement() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/categories?flat=true`, {
+      const response = await fetch(`http://localhost:5001/api/categories?flat=true`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -71,7 +71,7 @@ export default function CategoryManagement() {
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/categories', {
+      const response = await fetch('http://localhost:5001/api/categories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +101,7 @@ export default function CategoryManagement() {
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/categories/${id}`, {
+      const response = await fetch(`http://localhost:5001/api/categories/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
