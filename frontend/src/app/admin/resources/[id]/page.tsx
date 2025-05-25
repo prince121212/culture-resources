@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -11,13 +11,19 @@ interface Uploader {
   email: string;
 }
 
+interface Category {
+  _id: string;
+  name: string;
+  description?: string;
+}
+
 interface Resource {
   _id: string;
   title: string;
   description: string;
   link: string;
   uploader: Uploader;
-  category?: string;
+  category?: string | Category;
   tags?: string[];
   downloadCount: number;
   rating: number;
@@ -35,8 +41,9 @@ interface Resource {
   updatedAt: string;
 }
 
-export default function ResourceDetail({ params }: { params: { id: string } }) {
+export default function ResourceDetail({ params }: { params: Promise<{ id: string }> }) {
   const { token } = useAuth();
+  const resolvedParams = use(params);
   const [resource, setResource] = useState<Resource | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +53,7 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
     const fetchResource = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5001/api/resources/${params.id}`, {
+        const response = await fetch(`http://localhost:5001/api/resources/${resolvedParams.id}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -69,7 +76,7 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
     if (token) {
       fetchResource();
     }
-  }, [token, params.id]);
+  }, [token, resolvedParams.id]);
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -103,6 +110,12 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
       default:
         return status;
     }
+  };
+
+  const getCategoryName = (category?: string | Category) => {
+    if (!category) return '未分类';
+    if (typeof category === 'string') return category;
+    return category.name || '未分类';
   };
 
   const handleCheckLink = async () => {
@@ -230,77 +243,77 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
 
           <div className="mt-6">
             <h3 className="text-lg font-medium text-gray-900">资源描述</h3>
-            <p className="mt-2 text-gray-600 whitespace-pre-line">{resource.description || '无描述'}</p>
+            <p className="mt-2 text-gray-800 whitespace-pre-line font-medium leading-relaxed">{resource.description || '无描述'}</p>
           </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-lg font-medium text-gray-900">资源信息</h3>
-              <div className="mt-2 space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">资源链接:</span>
-                  <a href={resource.link} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 truncate max-w-xs">
+              <div className="mt-2 space-y-4">
+                <div className="flex justify-between items-start">
+                  <span className="text-gray-700 font-medium">资源链接:</span>
+                  <a href={resource.link} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 truncate max-w-xs font-medium">
                     {resource.link}
                   </a>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">分类:</span>
-                  <span>{resource.category || '未分类'}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 font-medium">分类:</span>
+                  <span className="text-gray-900 font-medium">{getCategoryName(resource.category)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">标签:</span>
+                <div className="flex justify-between items-start">
+                  <span className="text-gray-700 font-medium">标签:</span>
                   <div className="flex flex-wrap justify-end">
                     {resource.tags && resource.tags.length > 0 ? (
                       resource.tags.map((tag, index) => (
-                        <span key={index} className="ml-1 px-2 py-1 bg-gray-100 text-xs rounded-full">
+                        <span key={index} className="ml-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium">
                           {tag}
                         </span>
                       ))
                     ) : (
-                      <span>无标签</span>
+                      <span className="text-gray-900 font-medium">无标签</span>
                     )}
                   </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">下载次数:</span>
-                  <span>{resource.downloadCount}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 font-medium">下载次数:</span>
+                  <span className="text-gray-900 font-medium">{resource.downloadCount}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">评分:</span>
-                  <span>{resource.ratingCount > 0 ? `${resource.rating.toFixed(1)} (${resource.ratingCount}人评分)` : '暂无评分'}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 font-medium">评分:</span>
+                  <span className="text-gray-900 font-medium">{resource.ratingCount > 0 ? `${resource.rating.toFixed(1)} (${resource.ratingCount}人评分)` : '暂无评分'}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">版本:</span>
-                  <span>{resource.version}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 font-medium">版本:</span>
+                  <span className="text-gray-900 font-medium">{resource.version}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">是否公开:</span>
-                  <span>{resource.isPublic ? '是' : '否'}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 font-medium">是否公开:</span>
+                  <span className="text-gray-900 font-medium">{resource.isPublic ? '是' : '否'}</span>
                 </div>
               </div>
             </div>
 
             <div>
               <h3 className="text-lg font-medium text-gray-900">时间信息</h3>
-              <div className="mt-2 space-y-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">创建时间:</span>
-                  <span>{new Date(resource.createdAt).toLocaleString('zh-CN')}</span>
+              <div className="mt-2 space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 font-medium">创建时间:</span>
+                  <span className="text-gray-900 font-medium">{new Date(resource.createdAt).toLocaleString('zh-CN')}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">更新时间:</span>
-                  <span>{new Date(resource.updatedAt).toLocaleString('zh-CN')}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 font-medium">更新时间:</span>
+                  <span className="text-gray-900 font-medium">{new Date(resource.updatedAt).toLocaleString('zh-CN')}</span>
                 </div>
                 {resource.reviewedAt && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">审核时间:</span>
-                    <span>{new Date(resource.reviewedAt).toLocaleString('zh-CN')}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-medium">审核时间:</span>
+                    <span className="text-gray-900 font-medium">{new Date(resource.reviewedAt).toLocaleString('zh-CN')}</span>
                   </div>
                 )}
                 {resource.reviewedBy && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-500">审核人:</span>
-                    <span>{resource.reviewedBy.username}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-medium">审核人:</span>
+                    <span className="text-gray-900 font-medium">{resource.reviewedBy.username}</span>
                   </div>
                 )}
               </div>
@@ -308,7 +321,7 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
               {resource.status === 'rejected' && resource.rejectReason && (
                 <div className="mt-6">
                   <h3 className="text-lg font-medium text-red-600">拒绝原因</h3>
-                  <p className="mt-2 text-gray-600 bg-red-50 p-3 rounded-md border border-red-100">
+                  <p className="mt-2 text-red-800 bg-red-50 p-4 rounded-md border border-red-200 font-medium">
                     {resource.rejectReason}
                   </p>
                 </div>
@@ -317,7 +330,7 @@ export default function ResourceDetail({ params }: { params: { id: string } }) {
               {resource.status === 'terminated' && resource.rejectReason && (
                 <div className="mt-6">
                   <h3 className="text-lg font-medium text-purple-600">链接失效原因</h3>
-                  <p className="mt-2 text-gray-600 bg-purple-50 p-3 rounded-md border border-purple-100">
+                  <p className="mt-2 text-purple-800 bg-purple-50 p-4 rounded-md border border-purple-200 font-medium">
                     {resource.rejectReason}
                   </p>
                 </div>

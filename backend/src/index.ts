@@ -13,6 +13,7 @@ import notificationRoutes from './routes/notification.routes'; // 导入通知
 import categoryRoutes from './routes/category.routes'; // 导入分类路由
 import tagRoutes from './routes/tag.routes'; // 导入标签路由
 import settingRoutes from './routes/setting.routes'; // 导入设置路由
+import adminRoutes from './routes/admin.routes'; // 导入管理员路由
 import connectDB from './config/db'; // 导入数据库连接函数
 import { errorHandler } from './middleware/error.middleware'; // 导入错误处理中间件
 import { protect, AuthenticatedRequest } from './middleware/auth.middleware'; // 导入认证中间件
@@ -100,6 +101,7 @@ app.use('/api/tags', tagRoutes); // 挂载标签路由
 app.use('/api/notifications', notificationRoutes); // 挂载通知路由
 app.use('/api/settings', settingRoutes); // 挂载设置路由
 app.use('/api/favorites', favoriteRoutes); // 挂载收藏路由
+app.use('/api/admin', adminRoutes); // 挂载管理员路由
 
 // 使用错误处理中间件
 app.use(errorHandler);

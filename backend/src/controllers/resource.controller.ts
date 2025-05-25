@@ -18,7 +18,7 @@ export const createResource = async (req: AuthenticatedRequest, res: Response, n
       res.status(400).json({ message: 'Uploader ID is missing. User may not be authenticated properly.' });
       return;
     }
-    
+
     // 检查 title 和 link/url 字段
     const resourceLink = link || url;
     if (!title || !resourceLink) {
@@ -54,7 +54,7 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
 
     // Build query object
     const query: any = {};
-    
+
     // 如果明确指定了状态，则按状态过滤，否则不过滤状态
     if (req.query.status && req.query.status !== 'all') {
       query.status = req.query.status;
@@ -133,12 +133,35 @@ export const getResourceById = async (req: Request, res: Response, next: NextFun
       return;
     }
 
-    const resource = await Resource.findById(id).populate('uploader', 'username email');
+    const resource = await Resource.findById(id)
+      .populate('uploader', 'username email')
+      .populate('reviewedBy', 'username');
+
     if (!resource) {
       res.status(404).json({ message: 'Resource not found' });
       return;
     }
-    res.status(200).json(resource);
+
+    // 如果category是ObjectId，尝试获取分类信息
+    let populatedResource: any = resource.toObject();
+    if (resource.category && mongoose.Types.ObjectId.isValid(resource.category)) {
+      try {
+        const Category = mongoose.model('Category');
+        const categoryDoc = await Category.findById(resource.category);
+        if (categoryDoc) {
+          populatedResource.category = {
+            _id: categoryDoc._id,
+            name: categoryDoc.name,
+            description: categoryDoc.description
+          };
+        }
+      } catch (error) {
+        console.log('Category not found or error fetching category:', error);
+        // 如果获取分类失败，保持原始的category值
+      }
+    }
+
+    res.status(200).json(populatedResource);
   } catch (error) {
     next(error);
   }
