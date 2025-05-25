@@ -218,9 +218,9 @@ export default function ResourcesPage() {
                         categories.map((category) => (
                           <button
                             key={category._id}
-                            onClick={() => setSelectedCategory(selectedCategory === category.name ? '' : category.name)}
+                            onClick={() => setSelectedCategory(selectedCategory === category._id ? '' : category._id)}
                             className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              selectedCategory === category.name
+                              selectedCategory === category._id
                                 ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200'
                                 : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
                             }`}

@@ -54,6 +54,11 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
 
     // Build query object
     const query: any = {};
+    
+    // 如果明确指定了状态，则按状态过滤，否则不过滤状态
+    if (req.query.status && req.query.status !== 'all') {
+      query.status = req.query.status;
+    }
 
     // Filtering by keyword (searches title and description)
     if (req.query.keyword) {
@@ -63,7 +68,8 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
 
     // Filtering by category (exact match)
     if (req.query.category) {
-      query.category = req.query.category as string;
+      const category = req.query.category as string;
+      query.category = category;
     }
 
     // Filtering by tags (matches if resource contains ANY of the provided tags)
@@ -77,9 +83,7 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
     // Filtering by uploaderId
     if (uploaderId) {
       if (!mongoose.Types.ObjectId.isValid(uploaderId as string)) {
-        // Optional: return a 400 error for invalid ID format
-        // return res.status(400).json({ message: 'Invalid uploader ID format' });
-        // Or simply ignore the filter if ID is invalid, depending on desired behavior
+        // 如果ID格式无效，忽略此过滤条件
         console.warn(`Invalid uploaderId format provided: ${uploaderId}, ignoring filter.`);
       } else {
         query.uploader = uploaderId as string; // Apply uploader filter
@@ -97,6 +101,7 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
     }
 
     const totalResources = await Resource.countDocuments(query);
+
     const resources = await Resource.find(query)
       .populate('uploader', 'username email')
       .sort(sortOptions)

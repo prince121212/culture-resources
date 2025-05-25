@@ -93,12 +93,12 @@ export const getUserRating = async (
     },
   });
 
-  // 如果状态码是404，表示用户尚未评分
-  if (response.status === 404) {
+  const data = await response.json();
+
+  // 如果返回的数据表示未找到评分记录，返回null
+  if (data.message === '未找到评分记录') {
     return null;
   }
-
-  const data = await response.json();
 
   if (!response.ok) {
     throw new ApiError(

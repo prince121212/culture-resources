@@ -9,7 +9,7 @@ import { AuthenticatedRequest } from '../middleware/auth.middleware';
 // @access  Public
 export const getCategories = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { flat, activeOnly } = req.query;
+    const { flat, activeOnly, withResourceCount } = req.query;
     const query: any = {};
 
     // 如果指定了只获取活跃分类
@@ -22,7 +22,41 @@ export const getCategories = async (req: Request, res: Response, next: NextFunct
       .sort({ level: 1, order: 1 })
       .select('name description parent level order path isActive');
 
-    // 如果请求扁平结构，直接返回
+    // 默认添加资源计数，除非明确指定不需要
+    if (withResourceCount !== 'false') {
+      // 获取每个分类的资源计数
+      const categoryIds = categories.map(cat => (cat._id as mongoose.Types.ObjectId).toString());
+      
+      // 获取所有资源的分类统计
+      const resourceCounts = await Resource.aggregate([
+        { $match: { category: { $in: categoryIds } } },
+        { $group: { _id: '$category', count: { $sum: 1 } } }
+      ]);
+      
+      // 将计数添加到分类对象中
+      const categoriesWithCount = categories.map(category => {
+        const categoryObj = category.toObject();
+        const categoryId = (categoryObj._id as mongoose.Types.ObjectId).toString();
+        const resourceCount = resourceCounts.find(rc => rc._id === categoryId);
+        
+        // 确保resourceCount字段存在
+        return {
+          ...categoryObj,
+          resourceCount: resourceCount ? resourceCount.count : 0
+        };
+      });
+      
+      // 如果请求扁平结构，直接返回带有计数的分类
+      if (flat === 'true') {
+        return res.status(200).json(categoriesWithCount);
+      }
+      
+      // 构建树形结构
+      const categoryTree = buildCategoryTree(categoriesWithCount);
+      return res.status(200).json(categoryTree);
+    }
+    
+    // 如果明确指定不需要资源计数，按原来的逻辑处理
     if (flat === 'true') {
       return res.status(200).json(categories);
     }
@@ -258,20 +292,25 @@ const buildCategoryTree = (categories: any[]) => {
 
   // 首先将所有分类映射到一个Map中，以便快速查找
   categories.forEach(category => {
-    categoryMap.set(category._id.toString(), {
-      ...category.toObject(),
+    // 检查category是否已经是普通对象
+    const categoryObj = typeof category.toObject === 'function' ? category.toObject() : category;
+    
+    categoryMap.set(categoryObj._id.toString(), {
+      ...categoryObj,
       children: []
     });
   });
 
   // 然后构建树形结构
   categories.forEach(category => {
-    const categoryId = category._id.toString();
+    // 确保我们使用的是对象而不是mongoose文档
+    const categoryObj = typeof category.toObject === 'function' ? category.toObject() : category;
+    const categoryId = categoryObj._id.toString();
     const categoryWithChildren = categoryMap.get(categoryId);
 
-    if (category.parent) {
+    if (categoryObj.parent) {
       // 如果有父分类，将当前分类添加到父分类的children数组中
-      const parentId = category.parent.toString();
+      const parentId = categoryObj.parent.toString();
       const parent = categoryMap.get(parentId);
       if (parent) {
         parent.children.push(categoryWithChildren);

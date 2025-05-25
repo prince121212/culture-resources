@@ -71,7 +71,7 @@ export const getUserRating = async (req: AuthenticatedRequest, res: Response, ne
     const userRating = await Rating.findOne({ resource: resourceId, user: userId });
 
     if (!userRating) {
-      return res.status(404).json({ message: '未找到评分记录' });
+      return res.status(200).json({ message: '未找到评分记录' });
     }
 
     res.status(200).json(userRating);

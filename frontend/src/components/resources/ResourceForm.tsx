@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import React, { useState, FormEvent, useEffect, useRef } from 'react';
 import { CreateResourceData } from '@/services/resource.service';
@@ -80,7 +80,10 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     // 仅当 initialData 的内容实际发生变化时才更新
     if (initialData && currentInitialDataString !== prevInitialDataRef.current) {
       setTitle(initialData.title || '');
+      
+      // 处理 url 字段，确保表单能够正确显示链接
       setUrl(initialData.url || '');
+      
       setDescription(initialData.description || '');
       setCategory(initialData.category || '');
       setTagsString(Array.isArray(initialData.tags) ? initialData.tags.join(', ') : (initialData.tags || ''));
@@ -250,13 +253,13 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 shadow-md rounded-lg">
+    <form onSubmit={handleSubmit} className="space-y-6 bg-gray-800 p-8 rounded-lg">
       {/* Display other server errors */}
       {otherServerErrors.length > 0 && (
-        <div className="rounded-md bg-red-50 p-4 mb-4">
+        <div className="rounded-md bg-red-900 p-4 mb-4 border border-red-700">
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-red-800">请更正以下错误：</h3>
-            <ul className="list-disc list-inside text-sm text-red-700">
+            <h3 className="text-sm font-medium text-white">请更正以下错误：</h3>
+            <ul className="list-disc list-inside text-sm text-red-300">
               {otherServerErrors.map((errMsg, index) => (
                 <li key={`server-other-${index}`}>{errMsg}</li>
               ))}
@@ -266,23 +269,23 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       )}
 
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-          标题 <span className="text-red-500">*</span>
+        <label htmlFor="title" className="block text-sm font-bold text-white mb-1">
+          标题 <span className="text-red-400">*</span>
         </label>
         <input
           type="text"
           id="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm ${(titleError || serverTitleError) ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
+          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${(titleError || serverTitleError) ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
         />
-        {titleError && <p className="mt-1 text-xs text-red-600">{titleError}</p>}
-        {serverTitleError && <p className="mt-1 text-xs text-red-600">{serverTitleError}</p>}
+        {titleError && <p className="mt-1 text-xs text-red-400 font-medium">{titleError}</p>}
+        {serverTitleError && <p className="mt-1 text-xs text-red-400 font-medium">{serverTitleError}</p>}
       </div>
 
       <div>
-        <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-1">
-          链接 <span className="text-red-500">*</span>
+        <label htmlFor="url" className="block text-sm font-bold text-white mb-1">
+          链接 <span className="text-red-400">*</span>
         </label>
         <input
           type="url" 
@@ -290,14 +293,14 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           placeholder="https://example.com/resource"
-          className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm ${(urlError || serverUrlError) ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
+          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${(urlError || serverUrlError) ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
         />
-        {urlError && <p className="mt-1 text-xs text-red-600">{urlError}</p>}
-        {serverUrlError && <p className="mt-1 text-xs text-red-600">{serverUrlError}</p>}
+        {urlError && <p className="mt-1 text-xs text-red-400 font-medium">{urlError}</p>}
+        {serverUrlError && <p className="mt-1 text-xs text-red-400 font-medium">{serverUrlError}</p>}
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="description" className="block text-sm font-bold text-white mb-1">
           描述
         </label>
         <textarea
@@ -305,14 +308,14 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
-          className={`mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none sm:text-sm ${serverDescriptionError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
+          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${serverDescriptionError ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
         />
-        {serverDescriptionError && <p className="mt-1 text-xs text-red-600">{serverDescriptionError}</p>}
+        {serverDescriptionError && <p className="mt-1 text-xs text-red-400 font-medium">{serverDescriptionError}</p>}
       </div>
 
       <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-          分类 <span className="text-red-500">*</span>
+        <label htmlFor="category" className="block text-sm font-bold text-white mb-1">
+          分类 <span className="text-red-400">*</span>
         </label>
         <select
           id="category"
@@ -321,7 +324,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
             setCategory(e.target.value);
             setCategoryError(null);
           }}
-          className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm ${(categoryError || serverCategoryError) ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
+          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${(categoryError || serverCategoryError) ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
         >
           <option value="">请选择一个分类</option>
           {categories.map((cat) => (
@@ -330,12 +333,12 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
             </option>
           ))}
         </select>
-        {categoryError && <p className="mt-1 text-xs text-red-600">{categoryError}</p>}
-        {serverCategoryError && <p className="mt-1 text-xs text-red-600">{serverCategoryError}</p>}
+        {categoryError && <p className="mt-1 text-xs text-red-400 font-medium">{categoryError}</p>}
+        {serverCategoryError && <p className="mt-1 text-xs text-red-400 font-medium">{serverCategoryError}</p>}
       </div>
 
       <div>
-        <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="tags" className="block text-sm font-bold text-white mb-1">
           标签 (逗号或空格分隔，每个标签最多5个字)
         </label>
         <input
@@ -346,18 +349,18 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
             setTagsString(e.target.value);
             setTagsError(null);
           }}
-          className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none sm:text-sm ${(tagsError || serverTagsError) ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
+          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${(tagsError || serverTagsError) ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
           placeholder="例如：js, react, 教程"
         />
-        {tagsError && <p className="mt-1 text-xs text-red-600">{tagsError}</p>}
-        {serverTagsError && <p className="mt-1 text-xs text-red-600">{serverTagsError}</p>}
+        {tagsError && <p className="mt-1 text-xs text-red-400 font-medium">{tagsError}</p>}
+        {serverTagsError && <p className="mt-1 text-xs text-red-400 font-medium">{serverTagsError}</p>}
       </div>
 
       <div>
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
         >
           {isLoading ? '提交中...' : submitButtonText}
         </button>

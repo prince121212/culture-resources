@@ -15,9 +15,21 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5
 /**
  * 获取所有分类
  */
-export const getCategories = async (): Promise<Category[]> => {
+export const getCategories = async (params?: { withResourceCount?: boolean, flat?: boolean, activeOnly?: boolean }): Promise<Category[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/categories`);
+    // 构建查询参数
+    const queryParams = new URLSearchParams();
+    if (params) {
+      if (params.withResourceCount) queryParams.append('withResourceCount', 'true');
+      if (params.flat) queryParams.append('flat', 'true');
+      if (params.activeOnly) queryParams.append('activeOnly', 'true');
+    } else {
+      // 默认添加资源计数
+      queryParams.append('withResourceCount', 'true');
+    }
+    
+    const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+    const response = await axios.get(`${API_BASE_URL}/categories${queryString}`);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
