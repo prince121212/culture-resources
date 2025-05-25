@@ -181,8 +181,38 @@ export const getAvatar = async (req: Request, res: Response, next: NextFunction)
     console.log(`[getAvatar] User found: ${user ? user.username : 'null'}, Avatar ID from DB: ${user?.avatar}`);
 
     if (!user || !user.avatar) {
-      console.log(`[getAvatar] User or user.avatar not found for userId: ${userId}. User: ${JSON.stringify(user)}`);
-      res.sendStatus(404); // Directly send 404 status
+      console.log(`[getAvatar] User or user.avatar not found for userId: ${userId}. Returning default avatar.`);
+
+      // 获取默认头像ID
+      const { getDefaultAvatarId } = await import('../utils/defaultAvatar');
+      const defaultAvatarId = await getDefaultAvatarId();
+
+      if (!defaultAvatarId) {
+        res.status(404).json({ message: '用户或头像不存在' });
+        return;
+      }
+
+      // 使用默认头像ID继续处理
+      console.log(`[getAvatar] Using default avatar ID: ${defaultAvatarId}`);
+      const gfs = getGridFSBucket();
+      const downloadStream = gfs.openDownloadStream(new mongoose.Types.ObjectId(defaultAvatarId));
+
+      downloadStream.on('file', (file) => {
+        console.log(`[getAvatar] Streaming default avatar file: ${file.filename}, contentType: ${file.contentType}`);
+        res.set('Content-Type', file.contentType || 'image/png');
+        res.set('Content-Disposition', `inline; filename="${file.filename}"`);
+        res.set('Cache-Control', 'public, max-age=86400');
+        res.set('Access-Control-Allow-Origin', '*');
+      });
+
+      downloadStream.on('error', (err) => {
+        console.error(`[getAvatar] Error streaming default avatar:`, err);
+        if (!res.headersSent) {
+          res.sendStatus(404);
+        }
+      });
+
+      downloadStream.pipe(res);
       return;
     }
 
@@ -202,7 +232,7 @@ export const getAvatar = async (req: Request, res: Response, next: NextFunction)
       // 设置内容类型和缓存头部
       res.set('Content-Type', file.contentType || 'image/jpeg');
       res.set('Content-Disposition', `inline; filename="${file.filename}"`);
-      
+
       // 添加更严格的缓存控制，防止浏览器缓存
       res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.set('Pragma', 'no-cache');
@@ -215,7 +245,7 @@ export const getAvatar = async (req: Request, res: Response, next: NextFunction)
     downloadStream.on('error', (err) => {
       console.error(`[getAvatar] Error streaming file from GridFS for avatarId ${user.avatar}:`, err);
       if (!res.headersSent) {
-        res.sendStatus(404); // Directly send 404 status on stream error
+        res.sendStatus(404);
       }
     });
 

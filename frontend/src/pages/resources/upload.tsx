@@ -32,7 +32,7 @@ const UploadResource = () => {
           title,
           description,
           category,
-          tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+          tags: tags.split(/[,\s]+/).map(tag => tag.trim()).filter(tag => tag),
           link,
         },
         {
@@ -125,7 +125,7 @@ const UploadResource = () => {
 
             <div>
               <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-                标签 (用逗号分隔)
+                标签 (用逗号或空格分隔)
               </label>
               <input
                 type="text"
@@ -133,7 +133,7 @@ const UploadResource = () => {
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="例如: 文化,历史,艺术"
+                placeholder="例如: 文化 历史 艺术 或 文化,历史,艺术"
               />
             </div>
 
@@ -168,4 +168,4 @@ const UploadResource = () => {
   );
 };
 
-export default UploadResource; 
+export default UploadResource;

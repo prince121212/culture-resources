@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { body, validationResult } from 'express-validator';
 import User from '../models/user.model';
+import { getDefaultAvatarId } from '../utils/defaultAvatar';
 
 const router = express.Router();
 
@@ -21,11 +22,15 @@ router.post('/register', [
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
+  // 获取默认头像ID
+  const defaultAvatarId = await getDefaultAvatarId();
+
   const user = new User({
     username,
     email,
     password: hashedPassword,
     role: 'user',
+    avatar: defaultAvatarId, // 设置默认头像
     createdAt: new Date(),
     updatedAt: new Date(),
     points: 0,
@@ -48,10 +53,10 @@ router.post('/login', [
   }
 
   const { email, password } = req.body;
-  
+
   try {
     console.log('Attempting login for email:', email);
-    
+
     // 查找用户并包含密码字段
     const user = await User.findOne({ email }).select('+password');
     console.log('User found:', user ? {
@@ -60,7 +65,7 @@ router.post('/login', [
       hasPassword: !!user.password,
       role: user.role
     } : 'No user found');
-    
+
     if (!user) {
       res.status(401).json({ message: '用户不存在' });
       return;
@@ -73,7 +78,7 @@ router.post('/login', [
       storedPasswordHash: user.password,
       isMatch: isMatch
     });
-    
+
     if (!isMatch) {
       res.status(401).json({ message: '密码错误' });
       return;
@@ -117,4 +122,4 @@ router.post('/login', [
   }
 });
 
-export default router; 
+export default router;

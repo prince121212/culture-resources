@@ -258,26 +258,14 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
-                      {comment.author.avatar ? (
-                        <Image
-                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${comment.author._id}/avatar`}
-                          alt={comment.author.username}
-                          width={40}
-                          height={40}
-                          className="rounded-full object-cover"
-                          style={{ width: '40px', height: '40px' }}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = '/images/default-avatar.png';
-                          }}
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                          <span className="text-lg font-medium text-gray-500 dark:text-gray-400">
-                            {comment.author.username[0].toUpperCase()}
-                          </span>
-                        </div>
-                      )}
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${comment.author._id}/avatar`}
+                        alt={comment.author.username}
+                        width={40}
+                        height={40}
+                        className="rounded-full object-cover"
+                        style={{ width: '40px', height: '40px' }}
+                      />
                     </div>
                     <div>
                       <div className="text-sm font-medium text-gray-900 dark:text-white">

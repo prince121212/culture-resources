@@ -51,7 +51,7 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
     },
     avatar: {
       type: String,
-      default: null,
+      default: null, // 将通过脚本设置默认头像的GridFS ID
     },
   },
   {
@@ -90,4 +90,4 @@ UserSchema.methods.matchPassword = async function (enteredPassword: string): Pro
 // 修改模型创建方式，防止重复编译错误
 const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
 
-export default User; 
+export default User;

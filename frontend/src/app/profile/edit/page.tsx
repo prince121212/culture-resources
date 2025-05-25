@@ -7,6 +7,7 @@ import { updateUserProfile, UpdateUserProfileData } from '@/services/user.servic
 import { ApiError, ValidationError } from '@/services/auth.service';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -14,7 +15,6 @@ export default function EditProfilePage() {
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
@@ -27,7 +27,6 @@ export default function EditProfilePage() {
     if (currentUser) {
       setUsername(currentUser.username || '');
       setEmail(currentUser.email || '');
-      setAvatar(currentUser.avatar || null);
     }
   }, [currentUser]);
 
@@ -185,25 +184,24 @@ export default function EditProfilePage() {
             </label>
             <div className="flex items-center">
               <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mr-4">
-                {(avatarPreview || avatar) ? (
-                  avatarPreview ? (
-                    <img
-                      src={avatarPreview}
-                      alt="用户头像预览"
-                      className="object-cover w-full h-full"
-                    />
-                  ) : (
-                    <img
-                      src={currentUser?.avatar ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar?t=${Date.now()}` : '/images/default-avatar.png'}
-                      alt="用户头像"
-                      className="object-cover w-full h-full"
-                      onError={(e) => { (e.target as HTMLImageElement).src = '/images/default-avatar.png'; }}
-                    />
-                  )
+                {avatarPreview ? (
+                  <Image
+                    src={avatarPreview}
+                    alt="用户头像预览"
+                    width={96}
+                    height={96}
+                    className="object-cover"
+                    style={{ width: '96px', height: '96px' }}
+                  />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-gray-500">
-                    无头像
-                  </div>
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar?t=${Date.now()}`}
+                    alt="用户头像"
+                    width={96}
+                    height={96}
+                    className="object-cover"
+                    style={{ width: '96px', height: '96px' }}
+                  />
                 )}
               </div>
               <input

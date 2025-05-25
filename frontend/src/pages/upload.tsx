@@ -13,7 +13,16 @@ const Upload = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5001/api/resources/upload', { title, description, url, type, category, tags });
+      // 将标签字符串转换为数组
+      const tagsArray = tags.split(/[,\s]+/).map(tag => tag.trim()).filter(tag => tag);
+      const response = await axios.post('http://localhost:5001/api/resources/upload', {
+        title,
+        description,
+        url,
+        type,
+        category,
+        tags: tagsArray
+      });
       setMessage(response.data.message);
     } catch {
       setMessage('上传失败，请重试。');
@@ -29,7 +38,7 @@ const Upload = () => {
         <input type="url" placeholder="资源链接" value={url} onChange={(e) => setUrl(e.target.value)} required />
         <input type="text" placeholder="类型" value={type} onChange={(e) => setType(e.target.value)} required />
         <input type="text" placeholder="分类" value={category} onChange={(e) => setCategory(e.target.value)} required />
-        <input type="text" placeholder="标签" value={tags} onChange={(e) => setTags(e.target.value)} required />
+        <input type="text" placeholder="标签 (用空格或逗号分隔)" value={tags} onChange={(e) => setTags(e.target.value)} required />
         <button type="submit">上传</button>
       </form>
       {message && <p>{message}</p>}

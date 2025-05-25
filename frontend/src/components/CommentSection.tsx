@@ -240,16 +240,12 @@ export default function CommentSection({
       >
         <div className="flex items-start space-x-3">
           <Image
-            src={comment.author.avatar ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${comment.author._id}/avatar` : '/images/default-avatar.jpg'}
+            src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${comment.author._id}/avatar`}
             alt={comment.author.username}
             width={40}
             height={40}
             className="rounded-full object-cover"
             style={{ width: '40px', height: '40px' }}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = '/images/default-avatar.jpg';
-            }}
           />
           <div className="flex-1">
             <div className="flex items-center justify-between">
@@ -342,16 +338,12 @@ export default function CommentSection({
         <form onSubmit={handleSubmitComment} className="mb-8">
           <div className="flex items-start space-x-3">
             <Image
-              src={currentUser.avatar ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar` : '/images/default-avatar.jpg'}
+              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar`}
               alt={currentUser.username}
               width={40}
               height={40}
               className="rounded-full object-cover"
               style={{ width: '40px', height: '40px' }}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = '/images/default-avatar.jpg';
-              }}
             />
             <div className="flex-1">
               <textarea

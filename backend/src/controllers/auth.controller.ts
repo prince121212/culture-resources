@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import User, { IUser } from '../models/user.model';
 import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { getDefaultAvatarId } from '../utils/defaultAvatar';
 
 dotenv.config();
 
@@ -21,10 +22,14 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       return res.status(409).json({ message: 'Email already exists' });
     }
 
+    // 获取默认头像ID
+    const defaultAvatarId = await getDefaultAvatarId();
+
     const newUser = new User({
       username,
       email,
       password,
+      avatar: defaultAvatarId, // 设置默认头像
     });
 
     const savedUser = await newUser.save();
@@ -34,6 +39,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       _id: userIdString,
       username: savedUser.username,
       email: savedUser.email,
+      avatar: savedUser.avatar,
       createdAt: savedUser.createdAt,
       updatedAt: savedUser.updatedAt,
     };

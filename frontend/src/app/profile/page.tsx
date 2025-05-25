@@ -73,21 +73,14 @@ export default function ProfilePage() {
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 md:p-8 mb-8">
         <div className="flex items-center mb-6">
           <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mr-4">
-            {currentUser.avatar ? (
-              <Image
-                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar?t=${Date.now()}`}
-                alt="用户头像"
-                width={80}
-                height={80}
-                className="object-cover"
-                style={{ width: '80px', height: '80px' }}
-                onError={(e) => { (e.target as HTMLImageElement).src = '/images/default-avatar.png'; }}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-500">
-                无头像
-              </div>
-            )}
+            <Image
+              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar?t=${Date.now()}`}
+              alt="用户头像"
+              width={80}
+              height={80}
+              className="object-cover"
+              style={{ width: '80px', height: '80px' }}
+            />
           </div>
           <h1 className="text-3xl font-bold text-gray-800 dark:text-white">个人资料</h1>
         </div>

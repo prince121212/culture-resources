@@ -37,12 +37,12 @@ export default function UserDetail() {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
-  
+
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusLoading, setStatusLoading] = useState(false);
-  
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -59,14 +59,14 @@ export default function UserDetail() {
 
         const data = await response.json();
         setUser(data);
-        
+
         // 获取用户统计数据
         const statsResponse = await fetch(`http://localhost:5001/api/admin/users/${userId}/stats`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
-        
+
         if (statsResponse.ok) {
           const statsData = await statsResponse.json();
           setStats(statsData);
@@ -151,13 +151,13 @@ export default function UserDetail() {
           返回用户列表
         </Link>
       </div>
-      
+
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="p-6">
           <div className="flex items-start">
             <div className="flex-shrink-0">
               <img
-                src={user.avatar || '/images/default-avatar.png'}
+                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar`}
                 alt={user.username}
                 className="h-24 w-24 rounded-full object-cover"
               />
@@ -166,24 +166,24 @@ export default function UserDetail() {
               <h2 className="text-2xl font-bold text-gray-900">{user.username}</h2>
               <p className="text-gray-600">{user.email}</p>
               <div className="mt-2 flex items-center">
-                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                  ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 
-                    user.role === 'contributor' ? 'bg-blue-100 text-blue-800' : 
+                <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                  ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                    user.role === 'contributor' ? 'bg-blue-100 text-blue-800' :
                     'bg-green-100 text-green-800'}`}>
-                  {user.role === 'admin' ? '管理员' : 
+                  {user.role === 'admin' ? '管理员' :
                    user.role === 'contributor' ? '贡献者' : '普通用户'}
                 </span>
-                <span className={`ml-2 px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                  ${user.status === 'active' ? 'bg-green-100 text-green-800' : 
-                    user.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' : 
+                <span className={`ml-2 px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                  ${user.status === 'active' ? 'bg-green-100 text-green-800' :
+                    user.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' :
                     'bg-red-100 text-red-800'}`}>
-                  {user.status === 'active' ? '活跃' : 
+                  {user.status === 'active' ? '活跃' :
                    user.status === 'inactive' ? '非活跃' : '已禁用'}
                 </span>
               </div>
             </div>
           </div>
-          
+
           <div className="mt-6 border-t border-gray-200 pt-6">
             <h3 className="text-lg font-medium text-gray-900">用户信息</h3>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -205,7 +205,7 @@ export default function UserDetail() {
               </div>
             </div>
           </div>
-          
+
           {stats && (
             <div className="mt-6 border-t border-gray-200 pt-6">
               <h3 className="text-lg font-medium text-gray-900">用户活动统计</h3>
@@ -214,8 +214,8 @@ export default function UserDetail() {
                   <p className="text-sm font-medium text-gray-500">上传资源</p>
                   <p className="mt-1 text-2xl font-semibold text-gray-900">{stats.uploads.total}</p>
                   <div className="mt-1 text-xs text-gray-500">
-                    <span className="text-green-600">{stats.uploads.approved} 已通过</span> · 
-                    <span className="text-yellow-600 ml-1">{stats.uploads.pending} 待审核</span> · 
+                    <span className="text-green-600">{stats.uploads.approved} 已通过</span> ·
+                    <span className="text-yellow-600 ml-1">{stats.uploads.pending} 待审核</span> ·
                     <span className="text-red-600 ml-1">{stats.uploads.rejected} 已拒绝</span>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ export default function UserDetail() {
               </div>
             </div>
           )}
-          
+
           <div className="mt-6 border-t border-gray-200 pt-6">
             <h3 className="text-lg font-medium text-gray-900">用户管理</h3>
             <div className="mt-4 flex space-x-4">
@@ -248,7 +248,7 @@ export default function UserDetail() {
               >
                 编辑用户信息
               </button>
-              
+
               {user.status === 'active' ? (
                 <button
                   onClick={() => handleStatusChange('banned')}
@@ -266,8 +266,8 @@ export default function UserDetail() {
                   {statusLoading ? '处理中...' : '解除禁用'}
                 </button>
               ) : null}
-              
-              <Link 
+
+              <Link
                 href={`/admin/users/${userId}/resources`}
                 className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
               >

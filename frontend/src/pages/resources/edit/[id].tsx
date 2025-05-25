@@ -156,19 +156,27 @@ export default function EditResource() {
                 <div className="mt-2">
                   <input
                     type="text"
-                    placeholder="添加标签..."
+                    placeholder="添加标签 (用空格或逗号分隔，按Enter确认)..."
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
                         const input = e.target as HTMLInputElement;
-                        const value = input.value.trim();
-                        if (value && !resource.tags.includes(value)) {
-                          setResource({
-                            ...resource,
-                            tags: [...resource.tags, value],
-                          });
-                          input.value = '';
+                        const inputValue = input.value.trim();
+                        if (inputValue) {
+                          // 支持空格和逗号分隔的多个标签
+                          const newTags = inputValue
+                            .split(/[,\s]+/)
+                            .map(tag => tag.trim())
+                            .filter(tag => tag && !resource.tags.includes(tag));
+
+                          if (newTags.length > 0) {
+                            setResource({
+                              ...resource,
+                              tags: [...resource.tags, ...newTags],
+                            });
+                            input.value = '';
+                          }
                         }
                       }
                     }}
@@ -216,4 +224,4 @@ export default function EditResource() {
       </div>
     </Layout>
   );
-} 
+}

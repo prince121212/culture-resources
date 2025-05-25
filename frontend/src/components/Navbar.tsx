@@ -167,21 +167,14 @@ const Navbar: React.FC = () => {
                 >
                   <span className="text-sm font-medium">{user?.username}</span>
                   <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                    {user?.avatar ? (
-                      <Image
-                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar?t=${Date.now()}`}
-                        alt={user.username}
-                        width={32}
-                        height={32}
-                        className="object-cover"
-                        style={{ width: '32px', height: '32px' }}
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                      />
-                    ) : (
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                        {user?.username ? user.username[0].toUpperCase() : '?'}
-                      </span>
-                    )}
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user?._id}/avatar?t=${Date.now()}`}
+                      alt={user?.username || '用户头像'}
+                      width={32}
+                      height={32}
+                      className="object-cover"
+                      style={{ width: '32px', height: '32px' }}
+                    />
                   </div>
                 </button>
 
@@ -275,21 +268,14 @@ const Navbar: React.FC = () => {
               <div className="flex items-center px-4">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                    {user?.avatar ? (
-                      <Image
-                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar?t=${Date.now()}`}
-                        alt={user.username}
-                        width={40}
-                        height={40}
-                        className="object-cover"
-                        style={{ width: '40px', height: '40px' }}
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                      />
-                    ) : (
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                        {user?.username ? user.username[0].toUpperCase() : '?'}
-                      </span>
-                    )}
+                    <Image
+                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user?._id}/avatar?t=${Date.now()}`}
+                      alt={user?.username || '用户头像'}
+                      width={40}
+                      height={40}
+                      className="object-cover"
+                      style={{ width: '40px', height: '40px' }}
+                    />
                   </div>
                 </div>
                 <div className="ml-3">
