@@ -75,7 +75,7 @@ export default function ProfilePage() {
           <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mr-4">
             {currentUser.avatar ? (
               <Image
-                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar`}
+                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar?t=${Date.now()}`}
                 alt="用户头像"
                 width={80}
                 height={80}

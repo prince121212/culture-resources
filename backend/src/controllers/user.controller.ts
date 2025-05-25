@@ -202,7 +202,11 @@ export const getAvatar = async (req: Request, res: Response, next: NextFunction)
       // 设置内容类型和缓存头部
       res.set('Content-Type', file.contentType || 'image/jpeg');
       res.set('Content-Disposition', `inline; filename="${file.filename}"`);
-      res.set('Cache-Control', 'public, max-age=86400'); // 缓存1天
+      
+      // 添加更严格的缓存控制，防止浏览器缓存
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
 
       // 确保CORS头部正确设置（虽然全局中间件应该已经处理了）
       res.set('Access-Control-Allow-Origin', '*');

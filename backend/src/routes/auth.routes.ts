@@ -94,6 +94,7 @@ router.post('/login', [
       role: user.role,
       points: user.points,
       status: user.status,
+      avatar: user.avatar,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt
     };

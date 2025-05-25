@@ -27,13 +27,7 @@ export default function EditProfilePage() {
     if (currentUser) {
       setUsername(currentUser.username || '');
       setEmail(currentUser.email || '');
-      if (currentUser.avatar && currentUser.avatar.startsWith('/api/users/')) {
-        setAvatar(currentUser.avatar);
-      } else if (currentUser.avatar) {
-        setAvatar(`/api/users/${currentUser._id}/avatar`);
-      } else {
-        setAvatar(null);
-      }
+      setAvatar(currentUser.avatar || null);
     }
   }, [currentUser]);
 
@@ -113,6 +107,9 @@ export default function EditProfilePage() {
           // 更新用户头像信息
           if (data.user) {
             updatedUser.avatar = data.user.avatar;
+          } else if (data.avatarUrl) {
+            // 如果后端没有返回完整的用户对象，但返回了头像URL，也更新头像字段
+            updatedUser.avatar = data.avatarUrl.replace(`${process.env.NEXT_PUBLIC_API_BASE_URL}`, '');
           }
         } catch (error) {
           console.error('头像上传失败:', error);
@@ -197,7 +194,7 @@ export default function EditProfilePage() {
                     />
                   ) : (
                     <img
-                      src={currentUser?.avatar ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar` : '/images/default-avatar.png'}
+                      src={currentUser?.avatar ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${currentUser._id}/avatar?t=${Date.now()}` : '/images/default-avatar.png'}
                       alt="用户头像"
                       className="object-cover w-full h-full"
                       onError={(e) => { (e.target as HTMLImageElement).src = '/images/default-avatar.png'; }}

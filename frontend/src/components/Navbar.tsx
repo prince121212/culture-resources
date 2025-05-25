@@ -169,7 +169,7 @@ const Navbar: React.FC = () => {
                   <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                     {user?.avatar ? (
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar`}
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar?t=${Date.now()}`}
                         alt={user.username}
                         width={32}
                         height={32}
@@ -277,7 +277,7 @@ const Navbar: React.FC = () => {
                   <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                     {user?.avatar ? (
                       <Image
-                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar`}
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user._id}/avatar?t=${Date.now()}`}
                         alt={user.username}
                         width={40}
                         height={40}

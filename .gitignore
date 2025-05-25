@@ -66,4 +66,7 @@ next-env.d.ts
 
 # 忽略uploads目录下的所有文件
 backend/uploads/
-uploads/ 
+uploads/
+
+# 临时文件
+diff.md 
