@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.routes'; // 导入认证路由
 import resourceRoutes from './routes/resource.routes'; // 导入资源路由
 import userRoutes from './routes/user.routes'; // 导入用户路由
 import ratingRoutes from './routes/rating.routes'; // 导入评分路由
+import favoriteRoutes from './routes/favorite.routes'; // 导入收藏路由
 import notificationRoutes from './routes/notification.routes'; // 导入通知
 import categoryRoutes from './routes/category.routes'; // 导入分类路由
 import tagRoutes from './routes/tag.routes'; // 导入标签路由
@@ -98,6 +99,7 @@ app.use('/api/categories', categoryRoutes); // 挂载分类路由
 app.use('/api/tags', tagRoutes); // 挂载标签路由
 app.use('/api/notifications', notificationRoutes); // 挂载通知路由
 app.use('/api/settings', settingRoutes); // 挂载设置路由
+app.use('/api/favorites', favoriteRoutes); // 挂载收藏路由
 
 // 使用错误处理中间件
 app.use(errorHandler);

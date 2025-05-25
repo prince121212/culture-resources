@@ -44,7 +44,7 @@ export const favoriteResource = async (
   resourceId: string,
   token: string
 ): Promise<{ message: string }> => {
-  const response = await fetch(`${API_BASE_URL}/resources/${resourceId}/favorite`, {
+  const response = await fetch(`${API_BASE_URL}/favorites/resources/${resourceId}/favorite`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ export const unfavoriteResource = async (
   resourceId: string,
   token: string
 ): Promise<{ message: string }> => {
-  const response = await fetch(`${API_BASE_URL}/resources/${resourceId}/favorite`, {
+  const response = await fetch(`${API_BASE_URL}/favorites/resources/${resourceId}/favorite`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export const checkFavorite = async (
   resourceId: string,
   token: string
 ): Promise<{ isFavorite: boolean }> => {
-  const response = await fetch(`${API_BASE_URL}/resources/${resourceId}/favorite`, {
+  const response = await fetch(`${API_BASE_URL}/favorites/resources/${resourceId}/favorite`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
