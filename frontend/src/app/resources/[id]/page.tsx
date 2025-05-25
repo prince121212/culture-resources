@@ -10,6 +10,7 @@ import CommentSection from '@/components/resources/CommentSection';
 import RelatedResources from '@/components/resources/RelatedResources';
 import ResourceRating from '@/components/resources/ResourceRating';
 import RatingStars from '@/components/resources/RatingStars';
+import FavoriteButton from '@/components/resources/FavoriteButton';
 import toast from 'react-hot-toast';
 
 interface ResourceDetailViewProps {
@@ -102,6 +103,16 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
         >
           访问资源
         </a>
+        
+        {/* 收藏按钮 */}
+        <div className="flex items-center">
+          <FavoriteButton 
+            resourceId={resource._id} 
+            className="p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+          />
+          <span className="ml-2 text-gray-700 dark:text-gray-300">收藏</span>
+        </div>
+        
         {isUploader && (
           <div className="flex space-x-3">
             <Link
