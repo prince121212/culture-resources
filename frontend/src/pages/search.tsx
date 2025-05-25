@@ -22,7 +22,7 @@ const Search = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.get('http://localhost:5001/api/search', { params: { query, type, category, tags } });
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api'}/search`, { params: { query, type, category, tags } });
       setResources(response.data);
     } catch {
       setMessage('搜索失败，请重试。');
@@ -53,4 +53,4 @@ const Search = () => {
   );
 };
 
-export default Search; 
+export default Search;

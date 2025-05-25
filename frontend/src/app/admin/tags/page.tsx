@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { downloadStaticTemplate } from '@/utils/excel-template';
 
 interface Tag {
   _id: string;
@@ -23,6 +24,10 @@ export default function TagManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<any>(null);
   const [currentTag, setCurrentTag] = useState<Tag | null>(null);
   const [newTag, setNewTag] = useState({
     name: '',
@@ -32,7 +37,7 @@ export default function TagManagement() {
   const fetchTags = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5001/api/tags`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api'}/tags`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -169,6 +174,73 @@ export default function TagManagement() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // 验证文件类型
+      const allowedTypes = [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel'
+      ];
+
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('请选择Excel文件 (.xlsx 或 .xls)');
+        return;
+      }
+
+      // 验证文件大小 (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('文件大小不能超过5MB');
+        return;
+      }
+
+      setImportFile(file);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!importFile) {
+      toast.error('请选择要导入的Excel文件');
+      return;
+    }
+
+    try {
+      setImporting(true);
+      const formData = new FormData();
+      formData.append('file', importFile);
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api'}/tags/import`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || '导入失败');
+      }
+
+      setImportResult(result.data);
+      toast.success(result.message);
+      fetchTags();
+    } catch (error) {
+      console.error('导入标签出错:', error);
+      toast.error(error instanceof Error ? error.message : '导入失败，请稍后再试');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const resetImportModal = () => {
+    setShowImportModal(false);
+    setImportFile(null);
+    setImportResult(null);
+    setImporting(false);
+  };
+
   // 过滤和排序标签
   const filteredTags = tags
     .filter(tag =>
@@ -190,6 +262,13 @@ export default function TagManagement() {
             className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
           >
             添加标签
+          </button>
+
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+          >
+            批量导入
           </button>
 
           <label className="flex items-center">
@@ -392,6 +471,133 @@ export default function TagManagement() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 批量导入模态框 */}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-4">批量导入标签</h2>
+
+            {!importResult ? (
+              <div>
+                <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium text-blue-900">Excel文件格式要求：</h3>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => downloadStaticTemplate('excel', 'tag')}
+                        className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                      >
+                        下载Excel模板
+                      </button>
+                      <button
+                        onClick={() => downloadStaticTemplate('csv', 'tag')}
+                        className="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                      >
+                        下载CSV模板
+                      </button>
+                    </div>
+                  </div>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• 第一行为表头：标签名称、描述</li>
+                    <li>• 标签名称为必填项，长度1-30个字符</li>
+                    <li>• 描述为可选项，不超过200个字符</li>
+                    <li>• 支持.xlsx和.xls格式，文件大小不超过5MB</li>
+                  </ul>
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">选择Excel文件:</label>
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleFileChange}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                  {importFile && (
+                    <p className="mt-2 text-sm text-gray-600">
+                      已选择文件: {importFile.name} ({(importFile.size / 1024).toFixed(1)} KB)
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    type="button"
+                    onClick={resetImportModal}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+                    disabled={importing}
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleImport}
+                    disabled={!importFile || importing}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {importing ? '导入中...' : '开始导入'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="mb-4">
+                  <h3 className="font-medium mb-2">导入结果</h3>
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="bg-blue-50 p-3 rounded-lg text-center">
+                      <div className="text-2xl font-bold text-blue-600">{importResult.totalRows}</div>
+                      <div className="text-sm text-blue-800">总行数</div>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded-lg text-center">
+                      <div className="text-2xl font-bold text-green-600">{importResult.successCount}</div>
+                      <div className="text-sm text-green-800">成功</div>
+                    </div>
+                    <div className="bg-red-50 p-3 rounded-lg text-center">
+                      <div className="text-2xl font-bold text-red-600">{importResult.errorCount}</div>
+                      <div className="text-sm text-red-800">失败</div>
+                    </div>
+                  </div>
+                </div>
+
+                {importResult.createdTags.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="font-medium text-green-800 mb-2">成功创建的标签:</h4>
+                    <div className="max-h-32 overflow-y-auto bg-green-50 p-3 rounded-lg">
+                      {importResult.createdTags.map((tag: any, index: number) => (
+                        <div key={index} className="text-sm text-green-700">
+                          {tag.name}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {importResult.errors.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="font-medium text-red-800 mb-2">错误信息:</h4>
+                    <div className="max-h-32 overflow-y-auto bg-red-50 p-3 rounded-lg">
+                      {importResult.errors.map((error: any, index: number) => (
+                        <div key={index} className="text-sm text-red-700 mb-1">
+                          第{error.row}行: {error.error}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={resetImportModal}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                  >
+                    关闭
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

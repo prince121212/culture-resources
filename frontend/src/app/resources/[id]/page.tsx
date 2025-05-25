@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getResourceById, Resource as ResourceType, deleteResource /*, incrementDownloadCount*/ } from '@/services/resource.service';
+import { getResourceById, Resource as ResourceType, deleteResource, incrementDownloadCount } from '@/services/resource.service';
 import { ApiError } from '@/services/auth.service';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
@@ -63,12 +63,11 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
     }
   };
 
-  // 隐藏下载按钮后，此函数暂时不使用
-  // const handleGoToResourceClick = () => {
-  //   // Increment download count, fire and forget
-  //   incrementDownloadCount(resource._id);
-  //   // The browser will follow the href of the link naturally
-  // };
+  const handleGoToResourceClick = () => {
+    // Increment download count, fire and forget
+    incrementDownloadCount(resource._id);
+    // The browser will follow the href of the link naturally
+  };
 
   return (
     <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6 md:p-8">
@@ -103,8 +102,8 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
       )}
 
       <div className="mt-6 flex flex-wrap gap-4 items-center">
-        {/* 隐藏访问资源按钮 */}
-        {/* <a
+        {/* 访问资源按钮 */}
+        <a
           href={resource.link}
           target="_blank"
           rel="noopener noreferrer"
@@ -112,7 +111,7 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
           className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-lg focus:outline-none focus:shadow-outline transition-colors duration-150"
         >
           访问资源
-        </a> */}
+        </a>
 
         {/* 收藏按钮 */}
         <div className="flex items-center">

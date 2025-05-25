@@ -6,11 +6,14 @@ import {
   updateTag,
   deleteTag,
   getTagResources,
+  importTagsFromExcel,
+  syncTagCounts,
 } from '../controllers/tag.controller';
 import { protect, isAdmin } from '../middleware/auth.middleware';
 import { param, body, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import { excelUpload } from '../config/excel-upload';
 
 const router = Router();
 
@@ -116,6 +119,35 @@ router.put(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       await updateTag(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Excel批量导入标签
+router.post(
+  '/import',
+  protect,
+  isAdmin,
+  excelUpload.single('file'),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await importTagsFromExcel(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// 同步标签资源计数
+router.post(
+  '/sync-counts',
+  protect,
+  isAdmin,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await syncTagCounts(req, res, next);
     } catch (error) {
       next(error);
     }

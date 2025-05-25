@@ -6,11 +6,13 @@ import {
   updateCategory,
   deleteCategory,
   getCategoryResources,
+  importCategoriesFromExcel,
 } from '../controllers/category.controller';
 import { protect, isAdmin } from '../middleware/auth.middleware';
 import { param, body, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import { excelUpload } from '../config/excel-upload';
 
 const router = Router();
 
@@ -140,6 +142,21 @@ router.put(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       await updateCategory(req, res, next);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Excel批量导入分类
+router.post(
+  '/import',
+  protect,
+  isAdmin,
+  excelUpload.single('file'),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await importCategoriesFromExcel(req, res, next);
     } catch (error) {
       next(error);
     }

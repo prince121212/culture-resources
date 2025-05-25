@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import Category from '../models/category.model';
 import Resource from '../models/resource.model';
 import { AuthenticatedRequest } from '../middleware/auth.middleware';
+import { parseExcelFile, importCategories, validateExcelFile } from '../services/excel.service';
 
 // @desc    获取所有分类（支持树形结构）
 // @route   GET /api/categories
@@ -26,36 +27,36 @@ export const getCategories = async (req: Request, res: Response, next: NextFunct
     if (withResourceCount !== 'false') {
       // 获取每个分类的资源计数
       const categoryIds = categories.map(cat => (cat._id as mongoose.Types.ObjectId).toString());
-      
+
       // 获取所有资源的分类统计
       const resourceCounts = await Resource.aggregate([
         { $match: { category: { $in: categoryIds } } },
         { $group: { _id: '$category', count: { $sum: 1 } } }
       ]);
-      
+
       // 将计数添加到分类对象中
       const categoriesWithCount = categories.map(category => {
         const categoryObj = category.toObject();
         const categoryId = (categoryObj._id as mongoose.Types.ObjectId).toString();
         const resourceCount = resourceCounts.find(rc => rc._id === categoryId);
-        
+
         // 确保resourceCount字段存在
         return {
           ...categoryObj,
           resourceCount: resourceCount ? resourceCount.count : 0
         };
       });
-      
+
       // 如果请求扁平结构，直接返回带有计数的分类
       if (flat === 'true') {
         return res.status(200).json(categoriesWithCount);
       }
-      
+
       // 构建树形结构
       const categoryTree = buildCategoryTree(categoriesWithCount);
       return res.status(200).json(categoryTree);
     }
-    
+
     // 如果明确指定不需要资源计数，按原来的逻辑处理
     if (flat === 'true') {
       return res.status(200).json(categories);
@@ -294,7 +295,7 @@ const buildCategoryTree = (categories: any[]) => {
   categories.forEach(category => {
     // 检查category是否已经是普通对象
     const categoryObj = typeof category.toObject === 'function' ? category.toObject() : category;
-    
+
     categoryMap.set(categoryObj._id.toString(), {
       ...categoryObj,
       children: []
@@ -340,5 +341,45 @@ const updateChildCategoriesPaths = async (categoryId: mongoose.Types.ObjectId) =
 
     // 递归更新子分类的子分类
     await updateChildCategoriesPaths(childCategory._id as mongoose.Types.ObjectId);
+  }
+};
+
+// @desc    从Excel文件批量导入分类
+// @route   POST /api/categories/import
+// @access  Admin
+export const importCategoriesFromExcel = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    // 检查是否上传了文件
+    if (!req.file) {
+      return res.status(400).json({ message: '请上传Excel文件' });
+    }
+
+    // 验证文件格式
+    const validation = validateExcelFile(req.file);
+    if (!validation.valid) {
+      return res.status(400).json({ message: validation.error });
+    }
+
+    // 解析Excel文件
+    const categoriesData = parseExcelFile(req.file.buffer);
+
+    if (categoriesData.length === 0) {
+      return res.status(400).json({ message: 'Excel文件中没有找到有效的分类数据' });
+    }
+
+    // 导入分类
+    const importResult = await importCategories(categoriesData);
+
+    // 返回导入结果
+    res.status(200).json({
+      message: `导入完成，成功创建 ${importResult.successCount} 个分类，失败 ${importResult.errorCount} 个`,
+      data: importResult,
+    });
+  } catch (error) {
+    console.error('导入分类出错:', error);
+    res.status(500).json({
+      message: '导入分类失败',
+      error: error instanceof Error ? error.message : '未知错误'
+    });
   }
 };
