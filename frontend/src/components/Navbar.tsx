@@ -120,7 +120,6 @@ const Navbar: React.FC = () => {
     { href: '/profile', label: '个人中心' },
     { href: '/profile/uploads', label: '我的上传' },
     { href: '/profile/favorites', label: '我的收藏' },
-    { href: '/profile/downloads', label: '下载历史' },
   ];
 
   return (

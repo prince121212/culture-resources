@@ -6,7 +6,6 @@ import { AuthenticatedRequest } from '../middleware/auth.middleware';
 import mongoose from 'mongoose';
 // import Comment from '../models/comment.model'; // Commented out until the model is found/created
 import Favorite from '../models/favorite.model';
-import DownloadHistory from '../models/downloadHistory.model'; // Changed from Download to DownloadHistory
 import Rating from '../models/rating.model';
 import Category from '../models/category.model'; // Added import for Category
 import Tag from '../models/tag.model'; // Added import for Tag
@@ -345,7 +344,6 @@ export const getUserStats = async (req: AuthenticatedRequest, res: Response, nex
 
     const totalResourcesUploaded = await Resource.countDocuments({ uploader: id });
     const totalCollections = await Favorite.countDocuments({ user: id });
-    const totalDownloads = await DownloadHistory.countDocuments({ user: id }); // Changed from Download to DownloadHistory
     // const totalComments = await Comment.countDocuments({ user: id }); // Commented out until Comment model is available
     const totalRatings = await Rating.countDocuments({ user: id });
 
@@ -367,7 +365,6 @@ export const getUserStats = async (req: AuthenticatedRequest, res: Response, nex
     res.status(200).json({
       totalResourcesUploaded,
       totalCollections,
-      totalDownloads,
       // totalComments,
       totalRatings,
       recentUploads,
@@ -434,7 +431,6 @@ export const getSystemStats = async (req: AuthenticatedRequest, res: Response, n
     const totalRejectedResources = await Resource.countDocuments({ status: 'rejected' });
     const totalCategories = await Category.countDocuments();
     const totalTags = await Tag.countDocuments();
-    const totalDownloads = await DownloadHistory.countDocuments(); // Changed from Download to DownloadHistory
     // const totalComments = await Comment.countDocuments(); // Commented out until Comment model is available
     const totalRatings = await Rating.countDocuments();
     const totalFavorites = await Favorite.countDocuments();
@@ -460,7 +456,6 @@ export const getSystemStats = async (req: AuthenticatedRequest, res: Response, n
       totalRejectedResources,
       totalCategories,
       totalTags,
-      totalDownloads,
       // totalComments,
       totalRatings,
       totalFavorites,

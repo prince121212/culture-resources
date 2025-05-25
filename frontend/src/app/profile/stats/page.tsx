@@ -15,10 +15,6 @@ interface UserStats {
     pending: number;
     rejected: number;
   };
-  downloads: {
-    total: number;
-    lastMonth: number;
-  };
   ratings: {
     given: number;
     averageGiven: number;
@@ -126,15 +122,6 @@ export default function UserStatsPage() {
                 {renderStatCard('已通过', stats.uploads.approved)}
                 {renderStatCard('审核中', stats.uploads.pending)}
                 {renderStatCard('已拒绝', stats.uploads.rejected)}
-              </div>
-            </div>
-
-            {/* 下载统计 */}
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">下载统计</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {renderStatCard('总下载数', stats.downloads.total)}
-                {renderStatCard('本月下载', stats.downloads.lastMonth)}
               </div>
             </div>
 

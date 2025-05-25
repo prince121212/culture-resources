@@ -326,17 +326,6 @@ export const getUserStats = async (req: AuthenticatedRequest, res: Response, nex
       uploads.total += stat.count;
     });
 
-    // 获取用户下载统计
-    const DownloadHistory = mongoose.model('DownloadHistory');
-    const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    const totalDownloads = await DownloadHistory.countDocuments({ user: userId });
-    const monthlyDownloads = await DownloadHistory.countDocuments({
-      user: userId,
-      downloadDate: { $gte: firstDayOfMonth }
-    });
-
     // 获取用户评分统计
     const Rating = mongoose.model('Rating');
 
@@ -416,10 +405,6 @@ export const getUserStats = async (req: AuthenticatedRequest, res: Response, nex
     // 组合所有统计数据
     const stats = {
       uploads,
-      downloads: {
-        total: totalDownloads,
-        lastMonth: monthlyDownloads
-      },
       ratings: {
         given: givenRatingsCount,
         averageGiven: averageGivenRating,

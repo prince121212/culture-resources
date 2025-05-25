@@ -6,7 +6,6 @@ import Resource, { IResource } from './models/resource.model';
 import Category, { ICategory } from './models/category.model';
 import Tag, { ITag } from './models/tag.model';
 import Rating from './models/rating.model';
-import DownloadHistory from './models/downloadHistory.model';
 import Favorite from './models/favorite.model';
 import Notification from './models/notification.model';
 
@@ -40,10 +39,6 @@ const seedData = async () => {
         await Rating.collection.dropIndexes();
         console.log('Indexes dropped for Ratings collection.');
       }
-      if (mongoose.connection.collections.downloadhistories) {
-        await DownloadHistory.collection.dropIndexes();
-        console.log('Indexes dropped for DownloadHistory collection.');
-      }
       if (mongoose.connection.collections.favorites) {
         await Favorite.collection.dropIndexes();
         console.log('Indexes dropped for Favorites collection.');
@@ -65,7 +60,6 @@ const seedData = async () => {
     await Category.deleteMany({});
     await Tag.deleteMany({});
     await Rating.deleteMany({});
-    await DownloadHistory.deleteMany({});
     await Favorite.deleteMany({});
     await Notification.deleteMany({});
 
@@ -333,34 +327,6 @@ const seedData = async () => {
     });
     
     console.log('Ratings created...');
-    
-    // 创建下载历史
-    console.log('Creating download history...');
-    await DownloadHistory.create({
-      user: regularUser1._id,
-      resource: resource3._id,
-      downloadDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7天前
-    });
-    
-    await DownloadHistory.create({
-      user: regularUser2._id,
-      resource: resource1._id,
-      downloadDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3天前
-    });
-    
-    await DownloadHistory.create({
-      user: regularUser3._id,
-      resource: resource2._id,
-      downloadDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1天前
-    });
-    
-    await DownloadHistory.create({
-      user: moderatorUser._id,
-      resource: resource4._id,
-      downloadDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5天前
-    });
-    
-    console.log('Download history created...');
     
     // 创建收藏记录
     console.log('Creating favorites...');
