@@ -124,9 +124,9 @@ export default function CategoryManagement() {
 
   // 过滤和排序分类
   const filteredCategories = categories
-    .filter(category => 
-      (showInactive || category.isActive) && 
-      (searchQuery === '' || 
+    .filter(category =>
+      (showInactive || category.isActive) &&
+      (searchQuery === '' ||
         category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (category.description && category.description.toLowerCase().includes(searchQuery.toLowerCase())))
     )
@@ -148,8 +148,8 @@ export default function CategoryManagement() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">分类管理</h1>
-      
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">分类管理</h1>
+
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div className="flex items-center space-x-4">
           <button
@@ -158,7 +158,7 @@ export default function CategoryManagement() {
           >
             添加分类
           </button>
-          
+
           <label className="flex items-center">
             <input
               type="checkbox"
@@ -169,14 +169,14 @@ export default function CategoryManagement() {
             显示已禁用分类
           </label>
         </div>
-        
+
         <form onSubmit={handleSearch} className="flex">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="搜索分类..."
-            className="border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-gray-300 rounded-l-md px-4 py-2 text-gray-900 font-medium bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <button
             type="submit"
@@ -186,7 +186,7 @@ export default function CategoryManagement() {
           </button>
         </form>
       </div>
-      
+
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-500">加载中...</p>
@@ -196,13 +196,13 @@ export default function CategoryManagement() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">父分类</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">层级</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">排序</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">名称</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">描述</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">父分类</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">层级</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">排序</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">状态</th>
+                <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">操作</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -258,7 +258,7 @@ export default function CategoryManagement() {
           </table>
         </div>
       )}
-      
+
       {/* 添加分类模态框 */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

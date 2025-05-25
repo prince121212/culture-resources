@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // 组件挂载后执行
   useEffect(() => {
@@ -48,6 +49,23 @@ const Navbar: React.FC = () => {
       console.error('主题设置出错:', error);
     }
   }, []);
+
+  // 点击外部关闭下拉菜单
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   // 切换暗色/亮色模式
   const toggleDarkMode = () => {
@@ -160,44 +178,45 @@ const Navbar: React.FC = () => {
 
             {/* 用户菜单 */}
             {isAuthenticated ? (
-              <div className="relative">
+              <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+                  className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none transition-colors duration-200"
                 >
-                  <span className="text-sm font-medium">{user?.username}</span>
-                  <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
+                  <span className="text-sm font-semibold">{user?.username}</span>
+                  <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden border-2 border-gray-300 dark:border-gray-600">
                     <Image
                       src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user?._id}/avatar?t=${Date.now()}`}
                       alt={user?.username || '用户头像'}
                       width={32}
                       height={32}
-                      className="object-cover"
-                      style={{ width: '32px', height: '32px' }}
+                      className="object-cover w-full h-full"
                     />
                   </div>
                 </button>
 
                 {/* 下拉菜单 */}
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-card border border-border ring-1 ring-black ring-opacity-5">
+                  <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ring-1 ring-black ring-opacity-5 z-50">
+                    {/* 菜单项 */}
                     <div className="py-1">
                       {userMenuLinks.map((link) => (
                         <Link
                           key={link.href}
                           href={link.href}
-                          className="block px-4 py-2 text-sm text-foreground hover:bg-accent"
+                          className="block px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150"
                           onClick={() => setIsMenuOpen(false)}
                         >
                           {link.label}
                         </Link>
                       ))}
+                      <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                       <button
                         onClick={() => {
                           logout();
                           setIsMenuOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-accent"
+                        className="block w-full text-left px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-150"
                       >
                         退出登录
                       </button>
@@ -273,8 +292,7 @@ const Navbar: React.FC = () => {
                       alt={user?.username || '用户头像'}
                       width={40}
                       height={40}
-                      className="object-cover"
-                      style={{ width: '40px', height: '40px' }}
+                      className="object-cover w-full h-full"
                     />
                   </div>
                 </div>

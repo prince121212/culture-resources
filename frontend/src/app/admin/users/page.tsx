@@ -42,19 +42,19 @@ export default function UserManagement() {
     try {
       setLoading(true);
       let url = `http://localhost:5001/api/admin/users?page=${page}&limit=10`;
-      
+
       if (searchQuery) {
         url += `&keyword=${encodeURIComponent(searchQuery)}`;
       }
-      
+
       if (roleFilter !== 'all') {
         url += `&role=${roleFilter}`;
       }
-      
+
       if (statusFilter !== 'all') {
         url += `&status=${statusFilter}`;
       }
-      
+
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -93,7 +93,7 @@ export default function UserManagement() {
 
   const handleRoleChange = async () => {
     if (!editingUser || !newRole) return;
-    
+
     try {
       const response = await fetch(`http://localhost:5001/api/admin/users/${editingUser._id}/role`, {
         method: 'PUT',
@@ -131,25 +131,25 @@ export default function UserManagement() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">用户管理</h1>
-      
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">用户管理</h1>
+
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div className="flex items-center space-x-4">
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="all">所有角色</option>
             <option value="user">普通用户</option>
             <option value="contributor">贡献者</option>
             <option value="admin">管理员</option>
           </select>
-          
+
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="all">所有状态</option>
             <option value="active">活跃</option>
@@ -157,14 +157,14 @@ export default function UserManagement() {
             <option value="banned">已禁用</option>
           </select>
         </div>
-        
+
         <form onSubmit={handleSearch} className="flex">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="搜索用户名或邮箱..."
-            className="border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-gray-300 rounded-l-md px-4 py-2 text-gray-900 font-medium bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <button
             type="submit"
@@ -174,7 +174,7 @@ export default function UserManagement() {
           </button>
         </form>
       </div>
-      
+
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-500">加载中...</p>
@@ -185,13 +185,13 @@ export default function UserManagement() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户名</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">角色</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">注册时间</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">积分</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">用户名</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">邮箱</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">角色</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">状态</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">注册时间</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">积分</th>
+                  <th className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">操作</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -200,35 +200,35 @@ export default function UserManagement() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{user.username}</div>
+                          <div className="text-sm font-bold text-gray-900">{user.username}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">{user.email}</div>
+                      <div className="text-sm text-gray-700 font-medium">{user.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 
-                          user.role === 'contributor' ? 'bg-blue-100 text-blue-800' : 
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                        ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                          user.role === 'contributor' ? 'bg-blue-100 text-blue-800' :
                           'bg-green-100 text-green-800'}`}>
-                        {user.role === 'admin' ? '管理员' : 
+                        {user.role === 'admin' ? '管理员' :
                          user.role === 'contributor' ? '贡献者' : '普通用户'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${user.status === 'active' ? 'bg-green-100 text-green-800' : 
-                          user.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' : 
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                        ${user.status === 'active' ? 'bg-green-100 text-green-800' :
+                          user.status === 'inactive' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-red-100 text-red-800'}`}>
-                        {user.status === 'active' ? '活跃' : 
+                        {user.status === 'active' ? '活跃' :
                          user.status === 'inactive' ? '非活跃' : '已禁用'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
                       {formatDate(user.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-bold">
                       {user.points}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -237,11 +237,11 @@ export default function UserManagement() {
                           setEditingUser(user);
                           setNewRole(user.role);
                         }}
-                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        className="text-indigo-600 hover:text-indigo-900 mr-4 font-semibold"
                       >
                         修改角色
                       </button>
-                      <Link href={`/admin/users/${user._id}`} className="text-indigo-600 hover:text-indigo-900">
+                      <Link href={`/admin/users/${user._id}`} className="text-indigo-600 hover:text-indigo-900 font-semibold">
                         查看详情
                       </Link>
                     </td>
@@ -250,11 +250,11 @@ export default function UserManagement() {
               </tbody>
             </table>
           </div>
-          
+
           {/* 分页控件 */}
           <div className="mt-6 flex justify-between items-center">
-            <div className="text-sm text-gray-500">
-              共 {pagination.totalUsers} 个用户，当前显示第 {pagination.currentPage} 页，共 {pagination.totalPages} 页
+            <div className="text-sm text-gray-800 font-medium">
+              共 <span className="font-bold text-gray-900">{pagination.totalUsers}</span> 个用户，当前显示第 <span className="font-bold text-gray-900">{pagination.currentPage}</span> 页，共 <span className="font-bold text-gray-900">{pagination.totalPages}</span> 页
             </div>
             <div className="flex space-x-2">
               <button
@@ -283,7 +283,7 @@ export default function UserManagement() {
           </div>
         </>
       )}
-      
+
       {/* 角色编辑模态框 */}
       {editingUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -297,7 +297,7 @@ export default function UserManagement() {
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="user">普通用户</option>
                 <option value="contributor">贡献者</option>

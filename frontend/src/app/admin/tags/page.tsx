@@ -95,7 +95,7 @@ export default function TagManagement() {
   const handleEditTag = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentTag) return;
-    
+
     try {
       const response = await fetch(`http://localhost:5001/api/tags/${currentTag._id}`, {
         method: 'PUT',
@@ -171,9 +171,9 @@ export default function TagManagement() {
 
   // 过滤和排序标签
   const filteredTags = tags
-    .filter(tag => 
-      (showInactive || tag.isActive) && 
-      (searchQuery === '' || 
+    .filter(tag =>
+      (showInactive || tag.isActive) &&
+      (searchQuery === '' ||
         tag.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (tag.description && tag.description.toLowerCase().includes(searchQuery.toLowerCase())))
     )
@@ -182,7 +182,7 @@ export default function TagManagement() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-6">标签管理</h1>
-      
+
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div className="flex items-center space-x-4">
           <button
@@ -191,7 +191,7 @@ export default function TagManagement() {
           >
             添加标签
           </button>
-          
+
           <label className="flex items-center">
             <input
               type="checkbox"
@@ -202,14 +202,14 @@ export default function TagManagement() {
             显示已禁用标签
           </label>
         </div>
-        
+
         <form onSubmit={handleSearch} className="flex">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="搜索标签..."
-            className="border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-gray-300 rounded-l-md px-4 py-2 text-gray-900 font-medium bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <button
             type="submit"
@@ -219,7 +219,7 @@ export default function TagManagement() {
           </button>
         </form>
       </div>
-      
+
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <p className="text-gray-500">加载中...</p>
@@ -294,7 +294,7 @@ export default function TagManagement() {
           </table>
         </div>
       )}
-      
+
       {/* 添加标签模态框 */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -339,7 +339,7 @@ export default function TagManagement() {
           </div>
         </div>
       )}
-      
+
       {/* 编辑标签模态框 */}
       {showEditModal && currentTag && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

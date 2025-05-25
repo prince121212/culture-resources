@@ -132,14 +132,14 @@ export default function AdminResources() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">资源管理</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">资源管理</h1>
 
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div className="flex items-center space-x-4">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-medium bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             <option value="all">所有状态</option>
             <option value="approved">已通过</option>
@@ -160,7 +160,7 @@ export default function AdminResources() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="搜索资源..."
-            className="border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-gray-300 rounded-l-md px-4 py-2 text-gray-900 font-medium bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <button
             type="submit"
@@ -181,19 +181,19 @@ export default function AdminResources() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     资源标题
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     上传者
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     状态
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     下载/评分
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     操作
                   </th>
                 </tr>
@@ -202,24 +202,24 @@ export default function AdminResources() {
                 {resources.map((resource) => (
                   <tr key={resource._id}>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{resource.title}</div>
-                      <div className="text-sm text-gray-500 truncate max-w-xs">{resource.description}</div>
+                      <div className="text-sm font-bold text-gray-900">{resource.title}</div>
+                      <div className="text-sm text-gray-700 truncate max-w-xs">{resource.description}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{resource.uploader.username}</div>
-                      <div className="text-sm text-gray-500">{resource.uploader.email}</div>
+                      <div className="text-sm font-semibold text-gray-900">{resource.uploader.username}</div>
+                      <div className="text-sm text-gray-700">{resource.uploader.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(resource.status)}`}>
                         {getStatusText(resource.status)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 font-medium">
                       <div>下载: {resource.downloadCount}</div>
                       <div>评分: {resource.ratingCount > 0 ? `${resource.rating.toFixed(1)} (${resource.ratingCount})` : '暂无'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Link href={`/admin/resources/${resource._id}`} className="text-indigo-600 hover:text-indigo-900">
+                      <Link href={`/admin/resources/${resource._id}`} className="text-indigo-600 hover:text-indigo-900 font-semibold">
                         查看
                       </Link>
                     </td>
@@ -231,8 +231,8 @@ export default function AdminResources() {
 
           {/* 分页 */}
           <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-gray-700">
-              显示 <span className="font-medium">{(pagination.currentPage - 1) * pagination.limit + 1}</span> 到 <span className="font-medium">{Math.min(pagination.currentPage * pagination.limit, pagination.totalResources)}</span> 条，共 <span className="font-medium">{pagination.totalResources}</span> 条
+            <div className="text-sm text-gray-800 font-medium">
+              显示 <span className="font-bold text-gray-900">{(pagination.currentPage - 1) * pagination.limit + 1}</span> 到 <span className="font-bold text-gray-900">{Math.min(pagination.currentPage * pagination.limit, pagination.totalResources)}</span> 条，共 <span className="font-bold text-gray-900">{pagination.totalResources}</span> 条
             </div>
             <div className="flex space-x-2">
               <button
@@ -257,8 +257,8 @@ export default function AdminResources() {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">没有找到资源</h3>
-          <p className="mt-2 text-sm text-gray-500">
+          <h3 className="mt-4 text-lg font-bold text-gray-900">没有找到资源</h3>
+          <p className="mt-2 text-sm text-gray-700 font-medium">
             没有符合条件的资源，请尝试调整搜索条件。
           </p>
         </div>

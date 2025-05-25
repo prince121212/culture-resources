@@ -6,7 +6,7 @@ export interface IResource extends Document {
   description?: string;
   link: string;
   uploader: Types.ObjectId; // Reference to the User who uploaded the resource
-  category?: string; // Initially a string, can be ObjectId later
+  category?: string | Types.ObjectId; // Can be string or ObjectId
   tags?: string[]; // Initially an array of strings, can be array of ObjectIds later
   downloadCount: number;
   rating: number; // 平均评分
@@ -44,7 +44,7 @@ const ResourceSchema: Schema<IResource> = new Schema(
       required: true,
     },
     category: {
-      type: String, // For now, simple string. Later, can be Schema.Types.ObjectId, ref: 'Category'
+      type: Schema.Types.Mixed, // Can be String or ObjectId
       trim: true,
     },
     tags: {

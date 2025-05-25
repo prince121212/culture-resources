@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Resource, { IResource } from '../models/resource.model';
 import User from '../models/user.model'; // Needed for uploader info, etc.
+import Category from '../models/category.model';
 import { AuthenticatedRequest } from '../middleware/auth.middleware'; // To access req.user
 import mongoose from 'mongoose';
 import fetch from 'node-fetch';
@@ -128,6 +129,7 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
 export const getResourceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
+
     if (!mongoose.Types.ObjectId.isValid(id)) {
       res.status(400).json({ message: 'Invalid resource ID format' });
       return;
@@ -144,9 +146,9 @@ export const getResourceById = async (req: Request, res: Response, next: NextFun
 
     // 如果category是ObjectId，尝试获取分类信息
     let populatedResource: any = resource.toObject();
+
     if (resource.category && mongoose.Types.ObjectId.isValid(resource.category)) {
       try {
-        const Category = mongoose.model('Category');
         const categoryDoc = await Category.findById(resource.category);
         if (categoryDoc) {
           populatedResource.category = {

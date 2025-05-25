@@ -103,7 +103,8 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
 
         <div className="flex justify-between items-center">
           <div className="flex space-x-2">
-            <a
+            {/* 隐藏下载资源按钮 */}
+            {/* <a
               href={resource.link}
               target="_blank"
               rel="noopener noreferrer"
@@ -111,7 +112,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
               className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               下载资源
-            </a>
+            </a> */}
             <Link
               href={`/resources/${resource._id}`}
               className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
