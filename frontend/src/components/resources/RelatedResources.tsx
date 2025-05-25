@@ -22,6 +22,14 @@ const RelatedResources: React.FC<RelatedResourcesProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // 辅助函数：获取分类名称
+  const getCategoryName = (category: any): string => {
+    if (!category) return '未分类';
+    if (typeof category === 'string') return category;
+    if (typeof category === 'object' && category.name) return category.name;
+    return '未分类';
+  };
+
   useEffect(() => {
     const fetchRelatedResources = async () => {
       setIsLoading(true);
@@ -46,12 +54,12 @@ const RelatedResources: React.FC<RelatedResourcesProps> = ({
         }
 
         const response = await getResources(params);
-        
+
         // 过滤掉当前资源
         const filteredResources = response.data.filter(
           resource => resource._id !== currentResourceId
         );
-        
+
         // 如果过滤后的资源少于限制数量，可以考虑再次请求更多资源
         if (filteredResources.length < limit && response.pagination.totalResources > limit) {
           const moreParams = { ...params, limit: limit * 2 };
@@ -59,7 +67,7 @@ const RelatedResources: React.FC<RelatedResourcesProps> = ({
           const moreFilteredResources = moreResponse.data.filter(
             resource => resource._id !== currentResourceId
           ).slice(0, limit);
-          
+
           setResources(moreFilteredResources);
         } else {
           setResources(filteredResources.slice(0, limit));
@@ -125,7 +133,7 @@ const RelatedResources: React.FC<RelatedResourcesProps> = ({
               )}
               <div className="mt-4 flex items-center justify-between">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                  {resource.category || '未分类'}
+                  {getCategoryName(resource.category)}
                 </span>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                   {resource.downloadCount} 次下载

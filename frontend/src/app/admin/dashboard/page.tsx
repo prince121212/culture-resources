@@ -7,11 +7,15 @@ import toast from 'react-hot-toast';
 interface SystemStats {
   totalUsers: number;
   totalResources: number;
-  pendingResources: number;
-  approvedResources: number;
-  rejectedResources: number;
-  newUsers: number;
-  newResources: number;
+  totalPendingResources: number;
+  totalApprovedResources: number;
+  totalRejectedResources: number;
+  totalCategories: number;
+  totalTags: number;
+  totalRatings: number;
+  totalFavorites: number;
+  recentUsers: any[];
+  recentResources: any[];
 }
 
 export default function AdminDashboard() {
@@ -59,7 +63,7 @@ export default function AdminDashboard() {
   return (
     <div>
       <h1 className="text-2xl font-semibold mb-6">系统概览</h1>
-      
+
       {stats ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* 用户统计卡片 */}
@@ -76,7 +80,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-gray-500">最近7天新增: <span className="text-green-500 font-semibold">{stats.newUsers}</span></p>
+              <p className="text-sm text-gray-500">最近注册: <span className="text-green-500 font-semibold">{stats.recentUsers?.length || 0}</span></p>
             </div>
           </div>
 
@@ -94,7 +98,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-sm text-gray-500">最近7天新增: <span className="text-green-500 font-semibold">{stats.newResources}</span></p>
+              <p className="text-sm text-gray-500">最近上传: <span className="text-green-500 font-semibold">{stats.recentResources?.length || 0}</span></p>
             </div>
           </div>
 
@@ -108,7 +112,7 @@ export default function AdminDashboard() {
               </div>
               <div className="ml-4">
                 <h2 className="text-gray-600 text-sm">待审核资源</h2>
-                <p className="text-2xl font-semibold">{stats.pendingResources}</p>
+                <p className="text-2xl font-semibold">{stats.totalPendingResources}</p>
               </div>
             </div>
             <div className="mt-4">
@@ -126,13 +130,13 @@ export default function AdminDashboard() {
               </div>
               <div className="ml-4">
                 <h2 className="text-gray-600 text-sm">已审核资源</h2>
-                <p className="text-2xl font-semibold">{(stats.approvedResources || 0) + (stats.rejectedResources || 0)}</p>
+                <p className="text-2xl font-semibold">{(stats.totalApprovedResources || 0) + (stats.totalRejectedResources || 0)}</p>
               </div>
             </div>
             <div className="mt-4">
               <p className="text-sm text-gray-500">
-                通过: <span className="text-green-500 font-semibold">{stats.approvedResources || 0}</span> | 
-                拒绝: <span className="text-red-500 font-semibold">{stats.rejectedResources || 0}</span>
+                通过: <span className="text-green-500 font-semibold">{stats.totalApprovedResources || 0}</span> |
+                拒绝: <span className="text-red-500 font-semibold">{stats.totalRejectedResources || 0}</span>
               </p>
             </div>
           </div>

@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { MagnifyingGlassIcon, BookOpenIcon, FolderIcon, DocumentTextIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { getResources, Resource } from '@/services/resource.service';
 import { getCategories, Category } from '@/services/category.service';
 import { getTags } from '@/services/tag.service';
 
 export default function Home() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [stats, setStats] = useState({
     resourceCount: 0,
@@ -43,8 +45,8 @@ export default function Home() {
         setCategories(categoriesData);
 
         // 获取热门资源
-        const hotResourcesResponse = await getResources({ 
-          page: 1, 
+        const hotResourcesResponse = await getResources({
+          page: 1,
           limit: 3,
           sortBy: 'downloadCount',
           sortOrder: 'desc'
@@ -70,11 +72,29 @@ export default function Home() {
     fetchData();
   }, []);
 
+  // 处理搜索
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/resources?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push('/resources');
+    }
+  };
+
   // 获取分类对应的图标
   const getCategoryIcon = (categoryName: string) => {
     if (categoryName.includes('书') || categoryName.includes('学')) return BookOpenIcon;
     if (categoryName.includes('视频') || categoryName.includes('影')) return DocumentTextIcon;
     return FolderIcon; // 默认图标
+  };
+
+  // 辅助函数：获取分类名称
+  const getCategoryName = (category: any): string => {
+    if (!category) return '未分类';
+    if (typeof category === 'string') return category;
+    if (typeof category === 'object' && category.name) return category.name;
+    return '未分类';
   };
 
   return (
@@ -90,7 +110,7 @@ export default function Home() {
               发现、分享、学习优质文化资源
             </p>
             <div className="mt-8 max-w-xl mx-auto">
-              <div className="relative">
+              <form onSubmit={handleSearch} className="relative">
                 <input
                   type="text"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -98,10 +118,13 @@ export default function Home() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md transition-colors"
+                >
                   <MagnifyingGlassIcon className="h-5 w-5" />
                 </button>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -195,7 +218,7 @@ export default function Home() {
                       <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{resource.description}</p>
                       <div className="mt-4 flex items-center justify-between">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                          {resource.category}
+                          {getCategoryName(resource.category)}
                         </span>
                         <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                           <span>{resource.downloadCount || 0} 次下载</span>
@@ -243,7 +266,7 @@ export default function Home() {
                             </div>
                             <div className="flex items-center space-x-4">
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                                {resource.category}
+                                {getCategoryName(resource.category)}
                               </span>
                               <span className="text-sm text-gray-500 dark:text-gray-400">
                                 {new Date(resource.createdAt).toLocaleDateString()}

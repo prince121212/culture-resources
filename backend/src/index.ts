@@ -66,11 +66,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// 添加简单的请求日志中间件
-app.use((req: Request, _res: Response, next: NextFunction) => {
-  console.log(`${req.method} ${req.url}`);
-  next();
-});
+// 请求日志已由morgan处理
 
 app.get('/', (_req: Request, res: Response) => {
   res.send('Welcome to Express & TypeScript Server for Resource Sharing Platform');

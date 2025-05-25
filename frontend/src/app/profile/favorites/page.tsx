@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { getFavoriteResources, Resource, PaginatedResourcesResponse } from '@/services/resource.service';
+import { Resource, PaginatedResourcesResponse } from '@/services/resource.service';
+import { getFavoriteResources } from '@/services/favorite.service';
 import ResourceCard from '@/components/resources/ResourceCard';
 import { ApiError } from '@/services/auth.service';
 
@@ -31,7 +32,7 @@ export default function FavoritesPage() {
         setIsFetchingResources(true);
         setFetchError(null);
         try {
-          const response: PaginatedResourcesResponse = await getFavoriteResources(token);
+          const response: PaginatedResourcesResponse = await getFavoriteResources(token, 1, 50);
           setFavoriteResources(response.data);
         } catch (err) {
           let errorMessage = '获取您的收藏失败';
@@ -65,8 +66,8 @@ export default function FavoritesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center mb-8">
-        <Link 
-          href="/profile" 
+        <Link
+          href="/profile"
           className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4"
         >
           &larr; 返回个人中心
@@ -88,9 +89,9 @@ export default function FavoritesPage() {
         {!isFetchingResources && !fetchError && favoriteResources.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {favoriteResources.map(resource => (
-              <ResourceCard 
-                key={resource._id} 
-                resource={resource} 
+              <ResourceCard
+                key={resource._id}
+                resource={resource}
                 currentUserId={currentUser._id}
                 token={token}
                 onResourceDeleted={handleResourceRemoved}

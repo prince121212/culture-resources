@@ -33,6 +33,14 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
     });
   };
 
+  // 辅助函数：获取分类名称
+  const getCategoryName = (category: any): string => {
+    if (!category) return '未分类';
+    if (typeof category === 'string') return category;
+    if (typeof category === 'object' && category.name) return category.name;
+    return '未分类';
+  };
+
   const handleDelete = async () => {
     if (!token) {
       toast.error('请先登录');
@@ -66,7 +74,7 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
     <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6 md:p-8">
       <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-3">{resource.title}</h1>
       <div className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-        <p>分类: <span className="font-semibold text-indigo-600 dark:text-indigo-400">{resource.category || '未分类'}</span></p>
+        <p>分类: <span className="font-semibold text-indigo-600 dark:text-indigo-400">{getCategoryName(resource.category)}</span></p>
         {resource.tags && resource.tags.length > 0 && (
           <p>标签: <span className="font-semibold text-gray-700 dark:text-gray-300">{resource.tags.join(', ')}</span></p>
         )}
@@ -239,7 +247,12 @@ export default function ResourceDetailPage() {
         <div className="mt-10">
           <RelatedResources
             currentResourceId={resource._id}
-            category={resource.category}
+            category={(() => {
+              if (!resource.category) return undefined;
+              if (typeof resource.category === 'string') return resource.category;
+              if (typeof resource.category === 'object' && 'name' in resource.category && resource.category.name) return resource.category.name;
+              return undefined;
+            })()}
             tags={resource.tags}
           />
         </div>

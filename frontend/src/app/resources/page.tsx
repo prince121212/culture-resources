@@ -22,6 +22,7 @@ export default function ResourcesPage() {
 
   // 状态管理
   const [searchQuery, setSearchQuery] = useState(searchParams?.get('q') || '');
+  const [searchInput, setSearchInput] = useState(searchParams?.get('q') || ''); // 临时搜索输入
   const [selectedCategory, setSelectedCategory] = useState(searchParams?.get('category') || '');
   const [selectedTags, setSelectedTags] = useState<string[]>(
     searchParams?.get('tags') ? searchParams.get('tags')!.split(',') : []
@@ -30,7 +31,7 @@ export default function ResourcesPage() {
   const [sortOrder, setSortOrder] = useState(searchParams?.get('sortOrder') || 'desc');
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams?.get('page') || '1'));
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  
+
   // 数据状态
   const [resources, setResources] = useState<Resource[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -38,6 +39,11 @@ export default function ResourcesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // 同步搜索输入框和搜索查询
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
 
   // 获取分类和标签数据
   useEffect(() => {
@@ -54,7 +60,7 @@ export default function ResourcesPage() {
         // 不设置错误状态，因为这不影响主要功能
       }
     };
-    
+
     fetchFiltersData();
   }, []);
 
@@ -63,7 +69,7 @@ export default function ResourcesPage() {
     const fetchResources = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
         const params: GetResourcesParams = {
           page: currentPage,
@@ -74,7 +80,7 @@ export default function ResourcesPage() {
           sortBy: sortBy === 'popular' ? 'downloadCount' : sortBy === 'rating' ? 'rating' : sortBy,
           sortOrder: sortOrder as ('asc' | 'desc')
         };
-        
+
         const response = await getResources(params);
         setResources(response.data);
         setTotalPages(response.pagination.totalPages);
@@ -85,9 +91,9 @@ export default function ResourcesPage() {
         setIsLoading(false);
       }
     };
-    
+
     fetchResources();
-    
+
     // 更新URL参数
     const params = new URLSearchParams();
     if (searchQuery) params.set('q', searchQuery);
@@ -96,11 +102,18 @@ export default function ResourcesPage() {
     if (sortBy !== 'createdAt') params.set('sortBy', sortBy);
     if (sortOrder !== 'desc') params.set('sortOrder', sortOrder);
     if (currentPage > 1) params.set('page', currentPage.toString());
-    
+
     const url = `/resources?${params.toString()}`;
     router.push(url);
-    
+
   }, [searchQuery, selectedCategory, selectedTags, sortBy, sortOrder, currentPage, router]);
+
+  // 处理搜索
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchQuery(searchInput.trim());
+    setCurrentPage(1); // 重置页码
+  };
 
   // 处理标签选择
   const handleTagToggle = (tagName: string) => {
@@ -134,6 +147,14 @@ export default function ResourcesPage() {
     setCurrentPage(1); // 重置页码
   };
 
+  // 辅助函数：获取分类名称
+  const getCategoryName = (category: any): string => {
+    if (!category) return '未分类';
+    if (typeof category === 'string') return category;
+    if (typeof category === 'object' && category.name) return category.name;
+    return '未分类';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -161,18 +182,21 @@ export default function ResourcesPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               {/* 搜索框 */}
               <div className="flex-1">
-                <div className="relative">
+                <form onSubmit={handleSearch} className="relative">
                   <input
                     type="text"
                     className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="搜索资源..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
                   />
-                  <button className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300">
+                  <button
+                    type="submit"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md transition-colors"
+                  >
                     <MagnifyingGlassIcon className="h-5 w-5" />
                   </button>
-                </div>
+                </form>
               </div>
 
               {/* 筛选按钮 */}
@@ -191,9 +215,9 @@ export default function ResourcesPage() {
 
               {/* 排序选择 */}
               <select
-                value={sortBy === 'createdAt' && sortOrder === 'desc' ? 'newest' : 
+                value={sortBy === 'createdAt' && sortOrder === 'desc' ? 'newest' :
                        sortBy === 'createdAt' && sortOrder === 'asc' ? 'oldest' :
-                       sortBy === 'downloadCount' ? 'popular' : 
+                       sortBy === 'downloadCount' ? 'popular' :
                        sortBy === 'rating' ? 'rating' : 'newest'}
                 onChange={(e) => handleSortChange(e.target.value)}
                 className="block w-full sm:w-48 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -288,7 +312,7 @@ export default function ResourcesPage() {
                     </p>
                     <div className="flex items-center text-sm mb-3">
                       <span className="inline-block px-2 py-1 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 rounded-md">
-                        {resource.category || '未分类'}
+                        {getCategoryName(resource.category)}
                       </span>
                       {resource.tags && resource.tags.length > 0 && (
                         <span className="ml-2 text-gray-500 dark:text-gray-400">
@@ -344,8 +368,8 @@ export default function ResourcesPage() {
               <DocumentTextIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mb-4" />
               <h3 className="text-xl font-medium text-gray-600 dark:text-gray-400 mb-1">暂无资源</h3>
               <p className="text-gray-500 dark:text-gray-500 mb-6">
-                {searchQuery || selectedCategory || selectedTags.length > 0 ? 
-                  '没有找到符合条件的资源，请尝试调整搜索条件。' : 
+                {searchQuery || selectedCategory || selectedTags.length > 0 ?
+                  '没有找到符合条件的资源，请尝试调整搜索条件。' :
                   '暂时没有任何资源，请稍后再查看。'}
               </p>
               {!authIsLoading && isAuthenticated && (
@@ -362,4 +386,4 @@ export default function ResourcesPage() {
       </div>
     </div>
   );
-} 
+}

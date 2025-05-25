@@ -34,6 +34,7 @@ export default function ProfilePage() {
         try {
           const response: PaginatedResourcesResponse = await getResources({
             uploaderId: currentUser._id,
+            status: 'all',
             sortBy: 'createdAt',
             sortOrder: 'desc',
             limit: 50,

@@ -96,7 +96,7 @@ export const checkFavorite = async (req: AuthenticatedRequest, res: Response, ne
     }
 
     const favorite = await Favorite.findOne({ user: userId, resource: resourceId });
-    
+
     res.status(200).json({ isFavorite: !!favorite });
     return;
   } catch (error) {
@@ -117,7 +117,7 @@ export const getFavorites = async (req: AuthenticatedRequest, res: Response, nex
     const skip = (page - 1) * limit;
 
     const totalFavorites = await Favorite.countDocuments({ user: userId });
-    
+
     const favorites = await Favorite.find({ user: userId })
       .populate({
         path: 'resource',
@@ -130,15 +130,17 @@ export const getFavorites = async (req: AuthenticatedRequest, res: Response, nex
       .skip(skip)
       .limit(limit);
 
-    // 提取资源数据
-    const resources = favorites.map(favorite => favorite.resource);
+    // 提取资源数据，过滤掉已删除的资源
+    const resources = favorites
+      .map(favorite => favorite.resource)
+      .filter(resource => resource !== null);
 
     res.status(200).json({
       data: resources,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(totalFavorites / limit),
-        totalResources: totalFavorites,
+        totalResources: resources.length, // 使用实际资源数量
         limit,
       },
     });

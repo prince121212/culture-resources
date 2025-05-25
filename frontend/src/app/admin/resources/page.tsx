@@ -56,9 +56,8 @@ export default function AdminResources() {
         url += `&keyword=${encodeURIComponent(searchQuery)}`;
       }
 
-      if (statusFilter !== 'all') {
-        url += `&status=${statusFilter}`;
-      }
+      // 管理员需要明确传递状态参数，包括 'all'
+      url += `&status=${statusFilter}`;
 
       const response = await fetch(url, {
         headers: {
@@ -188,6 +187,12 @@ export default function AdminResources() {
                     上传者
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    分类
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    上传时间
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                     状态
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -208,6 +213,27 @@ export default function AdminResources() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-semibold text-gray-900">{resource.uploader.username}</div>
                       <div className="text-sm text-gray-700">{resource.uploader.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {(() => {
+                          if (!resource.category) return '未分类';
+                          if (typeof resource.category === 'string') return resource.category;
+                          if (typeof resource.category === 'object' && resource.category.name) return resource.category.name;
+                          return '未分类';
+                        })()}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {new Date(resource.createdAt).toLocaleDateString('zh-CN', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(resource.status)}`}>

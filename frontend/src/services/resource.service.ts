@@ -47,6 +47,7 @@ export interface GetResourcesParams {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   uploaderId?: string; // Added for filtering by uploader
+  status?: string; // Added for filtering by status
 }
 
 export interface CreateResourceData {
@@ -59,6 +60,11 @@ export interface CreateResourceData {
 }
 
 export type UpdateResourceData = Partial<CreateResourceData>;
+
+export interface UpdateResourceResponse {
+  message: string;
+  data: Resource;
+}
 
 // API Service Functions
 
@@ -137,7 +143,7 @@ export const createResource = async (resourceData: CreateResourceData, token: st
  * Updates an existing resource.
  * Requires authentication token.
  */
-export const updateResource = async (id: string, resourceData: UpdateResourceData, token: string): Promise<Resource> => {
+export const updateResource = async (id: string, resourceData: UpdateResourceData, token: string): Promise<UpdateResourceResponse> => {
   const response = await fetch(`${API_BASE_URL}/resources/${id}`, {
     method: 'PUT',
     headers: {
@@ -151,7 +157,7 @@ export const updateResource = async (id: string, resourceData: UpdateResourceDat
   if (!response.ok) {
     throw new ApiError(response.status, `Failed to update resource ${id}`, data as ApiErrorData);
   }
-  return data as Resource;
+  return data as UpdateResourceResponse;
 };
 
 /**
@@ -200,20 +206,3 @@ export const incrementDownloadCount = async (resourceId: string): Promise<void> 
   }
 };
 
-/**
- * Fetches user's favorite resources.
- * Requires authentication token.
- */
-export const getFavoriteResources = async (token: string): Promise<Resource[]> => {
-  const response = await fetch(`${API_BASE_URL}/favorites`, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
-  });
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new ApiError(response.status, 'Failed to fetch favorite resources', data as ApiErrorData);
-  }
-  return data as Resource[];
-};

@@ -9,6 +9,7 @@ import {
   updateResource,
   CreateResourceData, // Re-used for form structure, though it's an update
   Resource as ResourceType,
+  UpdateResourceResponse,
 } from '@/services/resource.service';
 import { ApiError, ValidationError } from '@/services/auth.service';
 import toast from 'react-hot-toast';
@@ -18,7 +19,7 @@ export default function EditResourcePage() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { user: currentUser, token, isAuthenticated, isLoading: authLoading } = useAuth();
-  
+
   const resourceId = params?.id || null;
 
   const [resource, setResource] = useState<ResourceType | null>(null);
@@ -82,8 +83,11 @@ export default function EditResourcePage() {
     setServerValidationErrors([]);
 
     try {
-      const updated = await updateResource(resourceId, data, token);
-      toast.success('资源更新成功！');
+      const response: UpdateResourceResponse = await updateResource(resourceId, data, token);
+      // 处理新的响应格式
+      const updated = response.data;
+      const message = response.message;
+      toast.success(message);
       router.push(`/resources/${updated._id}`);
     } catch (err: unknown) {
       let toastMessage = '更新资源失败，请重试。';
@@ -95,7 +99,7 @@ export default function EditResourcePage() {
         if (err.response?.errors && Array.isArray(err.response.errors)) {
           specificFieldErrors = err.response.errors;
           // If specific errors exist, the toast message might be better as a general one
-          toastMessage = err.response.message || "请检查表单中的错误。"; 
+          toastMessage = err.response.message || "请检查表单中的错误。";
         } else {
           // No specific field errors from backend, so this is a general API error
           pageLevelErrorMessage = err.response?.message || err.message;
@@ -104,7 +108,7 @@ export default function EditResourcePage() {
         toastMessage = err.message;
         pageLevelErrorMessage = err.message; // Treat other errors as general page errors
       }
-      
+
       setServerValidationErrors(specificFieldErrors);
       // Set generalPageError only if there are no specific field errors and pageLevelErrorMessage exists
       if (specificFieldErrors.length === 0 && pageLevelErrorMessage) {
@@ -182,14 +186,14 @@ export default function EditResourcePage() {
       )}
 
       <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden border border-gray-700">
-        <ResourceForm 
-          onSubmit={handleUpdate} 
-          initialData={formInitialData} 
-          isLoading={isSubmitting} 
+        <ResourceForm
+          onSubmit={handleUpdate}
+          initialData={formInitialData}
+          isLoading={isSubmitting}
           submitButtonText="更新资源"
           serverErrors={serverValidationErrors}
         />
       </div>
     </div>
   );
-} 
+}

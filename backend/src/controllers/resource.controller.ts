@@ -56,15 +56,21 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
     // Build query object
     const query: any = {};
 
-    // 如果明确指定了状态，则按状态过滤，否则不过滤状态
+    // 状态过滤：默认只显示已审核通过的资源，除非明确指定其他状态
     if (req.query.status && req.query.status !== 'all') {
       query.status = req.query.status;
+    } else if (!req.query.status) {
+      // 如果没有指定状态，默认只显示已审核通过的资源
+      query.status = 'approved';
     }
 
     // Filtering by keyword (searches title and description)
     if (req.query.keyword) {
       const keyword = req.query.keyword as string;
-      query.$text = { $search: keyword };
+      query.$or = [
+        { title: { $regex: keyword, $options: 'i' } },
+        { description: { $regex: keyword, $options: 'i' } }
+      ];
     }
 
     // Filtering by category (exact match)
@@ -109,8 +115,42 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
       .skip(skip)
       .limit(limit);
 
+    // 处理分类信息，将ObjectId转换为分类对象
+    const processedResources = await Promise.all(
+      resources.map(async (resource) => {
+        const resourceObj: any = resource.toObject();
+
+        // 处理分类信息：兼容ObjectId和字符串两种格式
+        if (resourceObj.category) {
+          if (mongoose.Types.ObjectId.isValid(resourceObj.category)) {
+            // 如果是ObjectId，查询分类信息
+            try {
+              const categoryDoc = await Category.findById(resourceObj.category);
+              if (categoryDoc) {
+                resourceObj.category = {
+                  _id: (categoryDoc._id as any).toString(),
+                  name: categoryDoc.name,
+                  description: categoryDoc.description
+                };
+              }
+            } catch (error) {
+              // 如果获取分类失败，保持原始的category值
+            }
+          } else if (typeof resourceObj.category === 'string') {
+            // 如果是字符串，直接使用（兼容旧数据）
+            resourceObj.category = {
+              name: resourceObj.category,
+              description: null
+            };
+          }
+        }
+
+        return resourceObj;
+      })
+    );
+
     res.status(200).json({
-      data: resources,
+      data: processedResources,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(totalResources / limit),
@@ -147,19 +187,28 @@ export const getResourceById = async (req: Request, res: Response, next: NextFun
     // 如果category是ObjectId，尝试获取分类信息
     let populatedResource: any = resource.toObject();
 
-    if (resource.category && mongoose.Types.ObjectId.isValid(resource.category)) {
-      try {
-        const categoryDoc = await Category.findById(resource.category);
-        if (categoryDoc) {
-          populatedResource.category = {
-            _id: categoryDoc._id,
-            name: categoryDoc.name,
-            description: categoryDoc.description
-          };
+    // 处理分类信息：兼容ObjectId和字符串两种格式
+    if (resource.category) {
+      if (mongoose.Types.ObjectId.isValid(resource.category)) {
+        // 如果是ObjectId，查询分类信息
+        try {
+          const categoryDoc = await Category.findById(resource.category);
+          if (categoryDoc) {
+            populatedResource.category = {
+              _id: (categoryDoc._id as any).toString(),
+              name: categoryDoc.name,
+              description: categoryDoc.description
+            };
+          }
+        } catch (error) {
+          // 如果获取分类失败，保持原始的category值
         }
-      } catch (error) {
-        console.log('Category not found or error fetching category:', error);
-        // 如果获取分类失败，保持原始的category值
+      } else if (typeof resource.category === 'string') {
+        // 如果是字符串，直接使用（兼容旧数据）
+        populatedResource.category = {
+          name: resource.category,
+          description: null
+        };
       }
     }
 
@@ -203,8 +252,17 @@ export const updateResource = async (req: AuthenticatedRequest, res: Response, n
     if (category) resource.category = category;
     if (tags) resource.tags = tags;
 
+    // 重置资源状态为待审核，清除审核相关信息
+    resource.status = 'pending';
+    resource.reviewedBy = undefined;
+    resource.reviewedAt = undefined;
+    resource.rejectReason = undefined;
+
     const updatedResource = await resource.save();
-    res.status(200).json(updatedResource);
+    res.status(200).json({
+      message: '资源更新成功，已重新提交审核',
+      data: updatedResource
+    });
   } catch (error) {
     next(error);
   }

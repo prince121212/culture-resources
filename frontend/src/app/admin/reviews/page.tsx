@@ -189,7 +189,12 @@ export default function AdminReviews() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        {resource.category || '未分类'}
+                        {(() => {
+                          if (!resource.category) return '未分类';
+                          if (typeof resource.category === 'string') return resource.category;
+                          if (typeof resource.category === 'object' && resource.category.name) return resource.category.name;
+                          return '未分类';
+                        })()}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

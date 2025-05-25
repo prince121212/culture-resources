@@ -21,7 +21,7 @@ export default function AdminLayout({
     console.log("Is authenticated:", isAuthenticated);
     console.log("Is loading:", isLoading);
     console.log("User role:", user?.role);
-    
+
     // 检查用户是否已认证且是管理员
     if (!isLoading) {
       if (!isAuthenticated) {
@@ -29,7 +29,7 @@ export default function AdminLayout({
         router.push('/auth/login');
         return;
       }
-      
+
       if (user && user.role !== 'admin') {
         toast.error('您需要管理员权限才能访问此页面');
         router.push('/');
@@ -46,12 +46,12 @@ export default function AdminLayout({
       </div>
     );
   }
-  
+
   // 如果未认证或非管理员，返回空内容，让上面的useEffect处理跳转
   if (!isAuthenticated || (user && user.role !== 'admin')) {
     return null;
   }
-  
+
   // 继续显示管理后台的正常内容
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -153,12 +153,7 @@ export default function AdminLayout({
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-gray-900">管理后台</h1>
-            <div className="flex items-center">
-              <span className="mr-4 text-gray-600">欢迎，{user?.username}</span>
-              <Link href="/auth/logout" className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm">
-                登出
-              </Link>
-            </div>
+            {/* 隐藏欢迎和登出信息 */}
           </div>
         </header>
         <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

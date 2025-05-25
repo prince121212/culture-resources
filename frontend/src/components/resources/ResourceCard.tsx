@@ -38,6 +38,50 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
     return format(new Date(dateString), 'yyyy年MM月dd日 HH:mm', { locale: zhCN });
   };
 
+  // 辅助函数：获取分类名称
+  const getCategoryName = (category: any): string => {
+    if (!category) return '未分类';
+    if (typeof category === 'string') return category;
+    if (typeof category === 'object' && category.name) return category.name;
+    return '未分类';
+  };
+
+  // 获取状态样式类
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'rejected':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'draft':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+      case 'terminated':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    }
+  };
+
+  // 获取状态文本
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return '已通过';
+      case 'pending':
+        return '待审核';
+      case 'rejected':
+        return '已拒绝';
+      case 'draft':
+        return '草稿';
+      case 'terminated':
+        return '已终止';
+      default:
+        return status;
+    }
+  };
+
   // 处理下载资源
   const handleDownload = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -72,9 +116,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
         )}
 
         <div className="flex flex-wrap gap-2 mb-3">
+          {/* 状态标签 */}
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(resource.status)}`}>
+            {getStatusText(resource.status)}
+          </span>
           {resource.category && (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-              {resource.category}
+              {getCategoryName(resource.category)}
             </span>
           )}
           {resource.tags && resource.tags.length > 0 && resource.tags.slice(0, 3).map((tag, index) => (

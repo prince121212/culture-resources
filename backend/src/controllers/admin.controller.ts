@@ -26,8 +26,42 @@ export const getPendingResources = async (req: AuthenticatedRequest, res: Respon
       .skip(skip)
       .limit(limit);
 
+    // 处理分类信息，将ObjectId转换为分类对象
+    const processedResources = await Promise.all(
+      resources.map(async (resource) => {
+        const resourceObj: any = resource.toObject();
+
+        // 处理分类信息：兼容ObjectId和字符串两种格式
+        if (resourceObj.category) {
+          if (mongoose.Types.ObjectId.isValid(resourceObj.category)) {
+            // 如果是ObjectId，查询分类信息
+            try {
+              const categoryDoc = await Category.findById(resourceObj.category);
+              if (categoryDoc) {
+                resourceObj.category = {
+                  _id: (categoryDoc._id as any).toString(),
+                  name: categoryDoc.name,
+                  description: categoryDoc.description
+                };
+              }
+            } catch (error) {
+              // 如果获取分类失败，保持原始的category值
+            }
+          } else if (typeof resourceObj.category === 'string') {
+            // 如果是字符串，直接使用（兼容旧数据）
+            resourceObj.category = {
+              name: resourceObj.category,
+              description: null
+            };
+          }
+        }
+
+        return resourceObj;
+      })
+    );
+
     res.status(200).json({
-      data: resources,
+      data: processedResources,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(totalResources / limit),
@@ -405,8 +439,42 @@ export const getUserResources = async (req: AuthenticatedRequest, res: Response,
       .skip(skip)
       .limit(limit);
 
+    // 处理分类信息，将ObjectId转换为分类对象
+    const processedResources = await Promise.all(
+      resources.map(async (resource) => {
+        const resourceObj: any = resource.toObject();
+
+        // 处理分类信息：兼容ObjectId和字符串两种格式
+        if (resourceObj.category) {
+          if (mongoose.Types.ObjectId.isValid(resourceObj.category)) {
+            // 如果是ObjectId，查询分类信息
+            try {
+              const categoryDoc = await Category.findById(resourceObj.category);
+              if (categoryDoc) {
+                resourceObj.category = {
+                  _id: (categoryDoc._id as any).toString(),
+                  name: categoryDoc.name,
+                  description: categoryDoc.description
+                };
+              }
+            } catch (error) {
+              // 如果获取分类失败，保持原始的category值
+            }
+          } else if (typeof resourceObj.category === 'string') {
+            // 如果是字符串，直接使用（兼容旧数据）
+            resourceObj.category = {
+              name: resourceObj.category,
+              description: null
+            };
+          }
+        }
+
+        return resourceObj;
+      })
+    );
+
     res.status(200).json({
-      data: resources,
+      data: processedResources,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(totalResources / limit),

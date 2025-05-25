@@ -64,7 +64,7 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
           message: `获取评论失败 (状态: ${response.status})`,
           errors: response.status === 404 ? [{ msg: '找不到评论资源' }] : errorDataFromServer.errors || [{msg: response.statusText}]
         };
-        console.error('Fetch comments error details:', errorDataFromServer);
+
         throw new ApiError(response.status, errorData.message, errorData);
       }
 
@@ -135,7 +135,7 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
       fetchComments(1); // 刷新评论列表，回到第一页
       onCommentAdded?.();
     } catch (err) {
-      console.error('Error in handleSubmitComment:', err); // 更详细的日志
+
       if (err instanceof ApiError) {
         toast.error(err.message || '提交评论时发生API错误');
       } else if (err instanceof Error) {
