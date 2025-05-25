@@ -45,12 +45,12 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
   const [serverCategoryError, setServerCategoryError] = useState<string | null>(null);
   const [serverTagsError, setServerTagsError] = useState<string | null>(null);
   const [otherServerErrors, setOtherServerErrors] = useState<string[]>([]);
-  
+
   // 修复点1: 正确初始化 useRef，添加初始值 undefined
   const prevServerErrorsRef = useRef<ValidationError[] | undefined>(undefined);
   // 新增：用于存储上一次 initialData 的字符串化版本
   const prevInitialDataRef = useRef<string | undefined>(undefined);
-  
+
   // 修复点2: 使用一个 ref 跟踪是否是首次渲染
   const isFirstRender = useRef<boolean>(true);
 
@@ -80,14 +80,14 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     // 仅当 initialData 的内容实际发生变化时才更新
     if (initialData && currentInitialDataString !== prevInitialDataRef.current) {
       setTitle(initialData.title || '');
-      
+
       // 处理 url 字段，确保表单能够正确显示链接
       setUrl(initialData.url || '');
-      
+
       setDescription(initialData.description || '');
       setCategory(initialData.category || '');
       setTagsString(Array.isArray(initialData.tags) ? initialData.tags.join(', ') : (initialData.tags || ''));
-      
+
       setTitleError(null);
       setUrlError(null);
       setCategoryError(null);
@@ -110,18 +110,18 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       isFirstRender.current = false;
       return;
     }
-    
+
     // 比较新旧 serverErrors，如果相同则不做任何操作
     const prevErrorsJson = JSON.stringify(prevServerErrorsRef.current);
     const currentErrorsJson = JSON.stringify(serverErrors);
-    
+
     if (prevErrorsJson === currentErrorsJson) {
       return;
     }
-    
+
     // 保存当前 serverErrors 以便下次比较
     prevServerErrorsRef.current = [...serverErrors];
-    
+
     // 一次性收集所有错误
     const newErrors = {
       title: null as string | null,
@@ -131,36 +131,36 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       tags: null as string | null,
       others: [] as string[]
     };
-    
+
     // 处理每个错误
     serverErrors.forEach(err => {
       if (!err || !err.path) {
         if (err && err.msg) newErrors.others.push(err.msg);
         return;
       }
-      
+
       switch (err.path) {
-        case 'title': 
-          newErrors.title = err.msg; 
+        case 'title':
+          newErrors.title = err.msg;
           break;
-        case 'url': 
-          newErrors.url = err.msg; 
+        case 'url':
+          newErrors.url = err.msg;
           break;
-        case 'description': 
-          newErrors.description = err.msg; 
+        case 'description':
+          newErrors.description = err.msg;
           break;
-        case 'category': 
-          newErrors.category = err.msg; 
+        case 'category':
+          newErrors.category = err.msg;
           break;
-        case 'tags': 
-          newErrors.tags = err.msg; 
+        case 'tags':
+          newErrors.tags = err.msg;
           break;
-        default: 
+        default:
           if (err.msg) newErrors.others.push(err.msg);
           break;
       }
     });
-    
+
     // 批量更新状态
     setServerTitleError(newErrors.title);
     setServerUrlError(newErrors.url);
@@ -195,10 +195,10 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       setCategoryError('请选择一个分类。');
       isValid = false;
     }
-    
+
     // 新增：标签验证
     const tags = tagsString
-      .split(/[,\\s]+/) // 按逗号或空格分割
+      .split(/[,\s]+/) // 按逗号或空格分割
       .map(tag => tag.trim())
       .filter(tag => tag !== '');
 
@@ -220,22 +220,22 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     // 在提交前清除客户端错误，以便validateForm可以重新设置它们
     setCategoryError(null);
     setTagsError(null);
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     const finalTags = tagsString
-      .split(/[,\\s]+/) // 按逗号或空格分割
+      .split(/[,\s]+/) // 按逗号或空格分割
       .map(tag => tag.trim())
       .filter(tag => tag !== '');
 
     // 双重检查标签长度，以防万一
     if (finalTags.some(tag => tag.length > 5)) {
         setTagsError('每个标签不能超过5个字。');
-        return; 
+        return;
     }
-      
+
     const resourceData: CreateResourceData = {
       title,
       url,
@@ -244,7 +244,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       category,
       tags: finalTags,
     };
-    
+
     try {
       await onSubmit(resourceData);
     } catch (error) {
@@ -288,7 +288,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
           链接 <span className="text-red-400">*</span>
         </label>
         <input
-          type="url" 
+          type="url"
           id="url"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
