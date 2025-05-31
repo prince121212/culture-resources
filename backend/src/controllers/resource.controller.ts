@@ -6,6 +6,7 @@ import { AuthenticatedRequest } from '../middleware/auth.middleware'; // To acce
 import mongoose from 'mongoose';
 import fetch from 'node-fetch';
 import Notification from '../models/notification.model';
+import Tag from '../models/tag.model';
 
 // @desc    Create a new resource
 // @route   POST /api/resources
@@ -27,13 +28,33 @@ export const createResource = async (req: AuthenticatedRequest, res: Response, n
       return;
     }
 
+    // 处理标签：如果标签不存在则新建
+    let processedTags: string[] = [];
+    if (Array.isArray(tags)) {
+      for (const tagName of tags) {
+        // 确保标签名称不为空且去除空格
+        const trimmedTagName = tagName.trim();
+        if (!trimmedTagName) continue;
+
+        let tagDoc = await Tag.findOne({ name: trimmedTagName });
+        if (!tagDoc) {
+          // 创建新标签
+          tagDoc = new Tag({ name: trimmedTagName });
+          await tagDoc.save();
+        }
+
+        // 将标签名称添加到资源的标签数组中（保持与资源模型一致）
+        processedTags.push(trimmedTagName);
+      }
+    }
+
     const newResource = new Resource({
       title,
       description,
       link: resourceLink,
       uploader,
       category,
-      tags,
+      tags: processedTags, // 使用标签名称而不是ID
     });
 
     const savedResource = await newResource.save();
@@ -91,7 +112,6 @@ export const getResources = async (req: Request, res: Response, next: NextFuncti
     if (uploaderId) {
       if (!mongoose.Types.ObjectId.isValid(uploaderId as string)) {
         // 如果ID格式无效，忽略此过滤条件
-        console.warn(`Invalid uploaderId format provided: ${uploaderId}, ignoring filter.`);
       } else {
         query.uploader = uploaderId as string; // Apply uploader filter
       }
@@ -250,7 +270,27 @@ export const updateResource = async (req: AuthenticatedRequest, res: Response, n
     if (description) resource.description = description;
     if (url) resource.link = url;
     if (category) resource.category = category;
-    if (tags) resource.tags = tags;
+
+    // 处理标签更新：如果提供了新标签，处理标签创建
+    if (tags && Array.isArray(tags)) {
+      let processedTags: string[] = [];
+      for (const tagName of tags) {
+        // 确保标签名称不为空且去除空格
+        const trimmedTagName = tagName.trim();
+        if (!trimmedTagName) continue;
+
+        let tagDoc = await Tag.findOne({ name: trimmedTagName });
+        if (!tagDoc) {
+          // 创建新标签
+          tagDoc = new Tag({ name: trimmedTagName });
+          await tagDoc.save();
+        }
+
+        // 将标签名称添加到资源的标签数组中
+        processedTags.push(trimmedTagName);
+      }
+      resource.tags = processedTags;
+    }
 
     // 重置资源状态为待审核，清除审核相关信息
     resource.status = 'pending';

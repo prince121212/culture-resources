@@ -131,6 +131,23 @@ export const reviewResource = async (req: AuthenticatedRequest, res: Response, n
       return;
     }
 
+    // 如果资源审核通过，更新相关标签的计数
+    if (status === 'approved' && updatedResource.tags && updatedResource.tags.length > 0) {
+      try {
+        // 为每个标签更新计数
+        for (const tagName of updatedResource.tags) {
+          await Tag.findOneAndUpdate(
+            { name: tagName },
+            { $inc: { count: 1 } }, // 增加计数
+            { upsert: false } // 不创建新标签，因为标签应该已经存在
+          );
+        }
+      } catch (tagUpdateError) {
+        // 标签计数更新失败不应该影响资源审核，只记录错误
+        console.error('更新标签计数时出错:', tagUpdateError);
+      }
+    }
+
     // 创建通知
     const notificationType = status === 'approved' ? 'resource_approved' : 'resource_rejected';
     const notificationTitle = status === 'approved' ? '资源审核通过' : '资源审核被拒绝';
