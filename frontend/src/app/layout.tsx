@@ -5,7 +5,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Toaster } from 'react-hot-toast';
 import Head from 'next/head';
-// import { StagewiseToolbar } from '@stagewise/toolbar-next';
+import { StagewiseToolbar } from '@stagewise/toolbar-next';
 // import { ExamplePlugin } from '@stagewise/plugin-example'; // <-- replace this with your plugin-name
 
 const geistSans = Geist({
@@ -28,6 +28,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const stagewiseConfig = {
+    plugins: []
+  };
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <Head>
@@ -51,6 +54,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {process.env.NODE_ENV === 'development' && (
+          <StagewiseToolbar config={stagewiseConfig} />
+        )}
         <AuthProvider>
           <Toaster
             position="top-center"
