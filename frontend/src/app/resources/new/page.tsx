@@ -79,28 +79,35 @@ export default function NewResourcePage() {
   }
   
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <div className="mb-6">
-          <Link href="/resources" className="text-indigo-600 hover:text-indigo-800">
-            &larr; 返回资源列表
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mb-8">
+          <Link 
+            href="/resources" 
+            className="inline-flex items-center px-4 py-2 bg-gray-700/70 backdrop-blur-sm rounded-full shadow-sm text-white hover:bg-gray-600/70 transition-all duration-200 font-medium"
+          >
+            <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 19L8 12L15 5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            返回资源列表
           </Link>
-        <h1 className="text-3xl font-bold text-gray-800 mt-2">上传新资源</h1>
-        <p className="text-gray-600 mt-1">与社区分享新的链接或文件。</p>
-      </div>
-
-      {generalFormError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-          <strong className="font-bold">错误：</strong>
-          <span className="block sm:inline">{generalFormError}</span>
+          <h1 className="text-3xl font-bold mt-2">上传资源</h1>
         </div>
-      )}
 
-      <ResourceForm 
-        onSubmit={handleSubmit} 
-        isLoading={isSubmitting} 
-        submitButtonText="上传资源"
-        serverErrors={serverValidationErrors}
-      />
+        {generalFormError && (
+          <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg text-red-600 dark:text-red-400 mb-6" role="alert">
+            <strong className="font-bold">错误：</strong>
+            <span className="block sm:inline">{generalFormError}</span>
+          </div>
+        )}
+
+        <ResourceForm 
+          onSubmit={handleSubmit} 
+          isLoading={isSubmitting} 
+          submitButtonText="提交审核"
+          serverErrors={serverValidationErrors}
+        />
+      </div>
     </div>
   );
 } 

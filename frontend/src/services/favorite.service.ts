@@ -44,7 +44,10 @@ export const favoriteResource = async (
   resourceId: string,
   token: string
 ): Promise<{ message: string }> => {
-  const response = await fetch(`${API_BASE_URL}/favorites/resources/${resourceId}/favorite`, {
+  const url = `${API_BASE_URL}/favorites/resources/${resourceId}/favorite`;
+  console.log('favoriteResource - Making POST request to:', url);
+
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -52,7 +55,9 @@ export const favoriteResource = async (
     },
   });
 
+  console.log('favoriteResource - Response status:', response.status);
   const data = await response.json();
+  console.log('favoriteResource - Response data:', data);
 
   if (!response.ok) {
     throw new ApiError(
@@ -72,7 +77,10 @@ export const unfavoriteResource = async (
   resourceId: string,
   token: string
 ): Promise<{ message: string }> => {
-  const response = await fetch(`${API_BASE_URL}/favorites/resources/${resourceId}/favorite`, {
+  const url = `${API_BASE_URL}/favorites/resources/${resourceId}/favorite`;
+  console.log('unfavoriteResource - Making DELETE request to:', url);
+
+  const response = await fetch(url, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -80,7 +88,9 @@ export const unfavoriteResource = async (
     },
   });
 
+  console.log('unfavoriteResource - Response status:', response.status);
   const data = await response.json();
+  console.log('unfavoriteResource - Response data:', data);
 
   if (!response.ok) {
     throw new ApiError(
@@ -130,14 +140,19 @@ export const toggleFavorite = async (
   token: string
 ): Promise<{ isFavorite: boolean; message: string }> => {
   try {
+    console.log('toggleFavorite called with:', { resourceId, isFavorite, API_BASE_URL });
+
     if (isFavorite) {
+      console.log('Unfavoriting resource...');
       const result = await unfavoriteResource(resourceId, token);
       return { isFavorite: false, message: result.message };
     } else {
+      console.log('Favoriting resource...');
       const result = await favoriteResource(resourceId, token);
       return { isFavorite: true, message: result.message };
     }
   } catch (error) {
+    console.error('toggleFavorite error:', error);
     if (error instanceof ApiError) {
       throw error;
     }

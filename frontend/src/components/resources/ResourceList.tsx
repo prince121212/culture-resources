@@ -239,12 +239,13 @@ const ResourceList: React.FC<ResourceListProps> = ({ initialParams = {} }) => {
       {resourcesResponse && resourcesResponse.data.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {resourcesResponse.data.map((resource) => (
-            <ResourceCard 
-              key={resource._id} 
-              resource={resource} 
+            <ResourceCard
+              key={resource._id}
+              resource={resource}
               currentUserId={currentUser?._id}
               token={token}
               onResourceDeleted={handleResourceDeleted}
+              showFavoriteButton={true}
             />
           ))}
         </div>

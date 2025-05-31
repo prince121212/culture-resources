@@ -18,6 +18,7 @@ coverage/
 build/
 dist/
 .next/
+.next/trace
 out/
 
 # 环境文件

@@ -116,12 +116,13 @@ export const getUserUploads = async (userId: string, token: string): Promise<any
 
 /**
  * 获取用户收藏的资源
- * @param userId 用户ID
+ * @param userId 用户ID (已弃用，现在从token中获取用户信息)
  * @param token 认证令牌
  * @returns 用户收藏的资源列表
  */
 export const getUserFavorites = async (userId: string, token: string): Promise<any[]> => {
-  const response = await fetch(`${API_URL}/users/favorites/${userId}`, {
+  // 使用正确的收藏API端点
+  const response = await fetch(`${API_URL}/favorites?page=1&limit=50`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -133,7 +134,9 @@ export const getUserFavorites = async (userId: string, token: string): Promise<a
   if (!response.ok) {
     throw new ApiError(response.status, data.message || '获取用户收藏资源失败', data as ApiErrorData);
   }
-  return data;
+
+  // 返回收藏的资源数据
+  return data.data || [];
 };
 
 /**

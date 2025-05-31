@@ -39,11 +39,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { href: '/tags', label: '标签' },
   ];
 
-  // 用户菜单链接
+  // 用户菜单链接 - 移除了"我的上传"和"我的收藏"，因为已集成到个人中心页面
   const userMenuLinks = [
     { href: '/profile', label: '个人中心' },
-    { href: '/profile/uploads', label: '我的上传' },
-    { href: '/profile/favorites', label: '我的收藏' },
   ];
 
   return (

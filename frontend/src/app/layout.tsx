@@ -5,6 +5,8 @@ import { AuthProvider } from "@/context/AuthContext";
 import Navbar from "@/components/Navbar";
 import { Toaster } from 'react-hot-toast';
 import Head from 'next/head';
+// import { StagewiseToolbar } from '@stagewise/toolbar-next';
+// import { ExamplePlugin } from '@stagewise/plugin-example'; // <-- replace this with your plugin-name
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "文明",
-  description: "一个用户可以上传和下载资源链接的平台",
+  title: "文明资源平台",
+  description: "发现、分享、学习优质文化资源",
 };
 
 export default function RootLayout({
@@ -47,21 +49,21 @@ export default function RootLayout({
         )}
       </Head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <Toaster 
+          <Toaster
             position="top-center"
             reverseOrder={false}
             toastOptions={{
               className: 'bg-card text-card-foreground border border-border',
             }}
           />
-          <div className="min-h-screen bg-newspaper dark:bg-gray-900">
-          <Navbar />
-          <main className="container mx-auto px-4 py-8">
-            {children}
-          </main>
+          <div className="min-h-screen bg-newspaper">
+            <Navbar />
+            <main>
+              {children}
+            </main>
           </div>
         </AuthProvider>
       </body>

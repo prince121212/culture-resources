@@ -84,14 +84,14 @@ const RatingStars: React.FC<RatingStarsProps> = ({
               onClick={() => handleClick(starValue)}
               onMouseEnter={() => handleMouseEnter(starValue)}
               onMouseLeave={handleMouseLeave}
-              className={`${readOnly ? 'cursor-default' : 'cursor-pointer'} focus:outline-none transition-colors duration-150`}
+              className={`${readOnly ? 'cursor-default' : 'cursor-pointer'} focus:outline-none transition-colors duration-150 mx-0.5`}
               disabled={readOnly}
               aria-label={`${starValue} 星`}
             >
               {isFilled ? (
-                <StarSolid className={`${getStarSize()} text-yellow-400`} />
+                <StarSolid className={`${getStarSize()} text-amber-500`} />
               ) : (
-                <StarOutline className={`${getStarSize()} text-gray-300 dark:text-gray-600`} />
+                <StarOutline className={`${getStarSize()} text-amber-300`} />
               )}
             </button>
           );
@@ -99,7 +99,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({
       </div>
       
       {showRatingText && (
-        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+        <span className="ml-3 text-sm font-medium text-amber-600">
           {getRatingText()}
         </span>
       )}

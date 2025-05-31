@@ -109,9 +109,20 @@ export const getResourceById = async (id: string): Promise<Resource> => {
  */
 export const createResource = async (resourceData: CreateResourceData, token: string): Promise<Resource> => {
   try {
-    console.log('Creating resource with data:', resourceData);
+    // 确保数据处理正确
+    const processedData = {
+      ...resourceData,
+      // 确保 link 和 url 字段的一致性
+      link: resourceData.url || resourceData.link,
+      // 确保标签是数组格式
+      tags: Array.isArray(resourceData.tags) ? resourceData.tags : [],
+      // 确保描述字段存在
+      description: resourceData.description || ''
+    };
+    
+    console.log('Creating resource with data:', JSON.stringify(processedData));
     console.log('API URL:', `${API_BASE_URL}/resources`);
-    console.log('Using token:', token ? 'Token exists' : 'No token');
+    console.log('Using token:', token.substring(0, 15) + '...');
 
     const response = await fetch(`${API_BASE_URL}/resources`, {
       method: 'POST',
@@ -119,23 +130,62 @@ export const createResource = async (resourceData: CreateResourceData, token: st
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify(resourceData),
+      body: JSON.stringify(processedData),
     });
 
-    const data = await response.json();
-    console.log('API Response:', response.status, data);
+    // 获取响应数据
+    const contentType = response.headers.get('content-type');
+    let data;
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const text = await response.text();
+      console.error('Non-JSON response:', text);
+      data = { message: '服务器返回了非JSON格式的响应' };
+    }
+
+    console.log('API Response:', response.status, JSON.stringify(data));
 
     if (!response.ok) {
       console.error('Error creating resource:', data);
-      throw new ApiError(response.status, 'Failed to create resource', data as ApiErrorData);
+      
+      if (!data || Object.keys(data).length === 0) {
+        throw new ApiError(response.status, '创建资源失败：服务器未返回错误详情', { message: '服务器错误，请稍后再试' });
+      }
+      
+      // 处理特殊格式的错误（例如 {errors: [{title: "错误信息"}]} ）
+      const errorData: ApiErrorData = { message: data.message || '创建资源失败' };
+      
+      if (data.errors && Array.isArray(data.errors)) {
+        const formattedErrors = data.errors.map((err: Record<string, string | unknown>) => {
+          // 处理格式为 {field: "错误信息"} 的错误
+          const errorKey = Object.keys(err)[0];
+          if (errorKey && typeof err[errorKey] === 'string') {
+            return {
+              path: errorKey,
+              msg: err[errorKey] as string
+            };
+          }
+          // 处理标准格式的错误
+          return err;
+        });
+        
+        errorData.errors = formattedErrors;
+        console.log('Formatted errors:', JSON.stringify(formattedErrors));
+      }
+      
+      throw new ApiError(response.status, errorData.message, errorData);
     }
     return data as Resource;
   } catch (error) {
     console.error('Exception in createResource:', error);
     if (error instanceof ApiError) {
       throw error;
+    } else if (error instanceof Error) {
+      console.error('Error details:', error.message, error.stack);
+      throw new ApiError(500, `创建资源时出错: ${error.message}`, { message: error.message });
     }
-    throw new Error('Network error while creating resource');
+    throw new ApiError(500, '创建资源时发生网络错误', { message: '网络错误，请检查您的连接并重试' });
   }
 };
 

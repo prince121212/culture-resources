@@ -7,6 +7,7 @@ import { MagnifyingGlassIcon, BookOpenIcon, FolderIcon, DocumentTextIcon, Inform
 import { getResources, Resource } from '@/services/resource.service';
 import { getCategories, Category } from '@/services/category.service';
 import { getTags } from '@/services/tag.service';
+import FavoriteButton from '@/components/resources/FavoriteButton';
 
 export default function Home() {
   const router = useRouter();
@@ -82,11 +83,26 @@ export default function Home() {
     }
   };
 
-  // 获取分类对应的图标
-  const getCategoryIcon = (categoryName: string) => {
-    if (categoryName.includes('书') || categoryName.includes('学')) return BookOpenIcon;
-    if (categoryName.includes('视频') || categoryName.includes('影')) return DocumentTextIcon;
-    return FolderIcon; // 默认图标
+  // 获取分类对应的emoji图标
+  const getCategoryEmoji = (categoryName: string) => {
+    if (categoryName.includes('文学') || categoryName.includes('书')) return '📚';
+    if (categoryName.includes('艺术') || categoryName.includes('设计')) return '🎨';
+    if (categoryName.includes('音乐') || categoryName.includes('舞蹈')) return '🎵';
+    if (categoryName.includes('历史') || categoryName.includes('文化')) return '🏛️';
+    if (categoryName.includes('戏曲') || categoryName.includes('表演')) return '🎭';
+    if (categoryName.includes('教育') || categoryName.includes('资料')) return '📖';
+    return '📁'; // 默认图标
+  };
+
+  // 获取分类对应的背景颜色
+  const getCategoryBgColor = (categoryName: string) => {
+    if (categoryName.includes('文学') || categoryName.includes('书')) return 'bg-red-100 dark:bg-red-900';
+    if (categoryName.includes('艺术') || categoryName.includes('设计')) return 'bg-blue-100 dark:bg-blue-900';
+    if (categoryName.includes('音乐') || categoryName.includes('舞蹈')) return 'bg-green-100 dark:bg-green-900';
+    if (categoryName.includes('历史') || categoryName.includes('文化')) return 'bg-yellow-100 dark:bg-yellow-900';
+    if (categoryName.includes('戏曲') || categoryName.includes('表演')) return 'bg-purple-100 dark:bg-purple-900';
+    if (categoryName.includes('教育') || categoryName.includes('资料')) return 'bg-indigo-100 dark:bg-indigo-900';
+    return 'bg-gray-100 dark:bg-gray-900'; // 默认颜色
   };
 
   // 辅助函数：获取分类名称
@@ -98,138 +114,147 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* 搜索区域 */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl md:text-6xl">
-              欢迎来到文化资源站
-            </h1>
-            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 dark:text-gray-400 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-              发现、分享、学习优质文化资源
-            </p>
-            <div className="mt-8 max-w-xl mx-auto">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="搜索资源..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-md transition-colors"
-                >
-                  <MagnifyingGlassIcon className="h-5 w-5" />
-                </button>
-              </form>
-            </div>
+    <div className="min-h-screen">
+      {/* 主内容区域 */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 欢迎横幅 */}
+        <div className="card p-12 text-center mb-8">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">欢迎来到文化资源站</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">发现、分享、学习优质文化资源</p>
+
+          {/* 搜索框 */}
+          <div className="max-w-2xl mx-auto relative">
+            <form onSubmit={handleSearch}>
+              <input
+                type="text"
+                placeholder="搜索您感兴趣的资源..."
+                className="input-field w-full pl-6 pr-20 py-6 text-lg"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button type="submit" className="btn-primary absolute right-2 top-1/2 -translate-y-1/2 px-6">搜索</button>
+            </form>
           </div>
         </div>
-      </div>
 
-      {isLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-        </div>
-      ) : error ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="loading-spinner"></div>
+          </div>
+        ) : error ? (
           <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg text-red-600 dark:text-red-400">
             {error}
           </div>
-        </div>
-      ) : (
-        <>
-          {/* 统计信息 */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400">资源总数</div>
-                <div className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">{stats.resourceCount}</div>
+        ) : (
+          <>
+            {/* 分类导航 */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">浏览分类</h2>
+                <Link
+                  href="/categories"
+                  className="text-amber-800 hover:text-amber-900 flex items-center space-x-1"
+                >
+                  <span>查看更多</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </Link>
               </div>
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400">分类总数</div>
-                <div className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">{stats.categoryCount}</div>
-              </div>
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                <div className="text-sm font-medium text-gray-500 dark:text-gray-400">标签总数</div>
-                <div className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">{stats.tagCount}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* 分类导航 */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">资源分类</h2>
-            {categories.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                {categories.slice(0, 4).map((category) => {
-                  const Icon = getCategoryIcon(category.name);
-                  return (
-                    <Link
-                      key={category._id}
-                      href={`/resources?category=${encodeURIComponent(category.name)}`}
-                      className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
-                    >
-                      <div className="flex items-center">
-                        <Icon className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-                        <div className="ml-4">
-                          <div className="text-lg font-medium text-gray-900 dark:text-white">{category.name}</div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">{category.resourceCount || 0} 个资源</div>
+              {categories.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {categories.slice(0, 6).map((category) => {
+                    const emoji = getCategoryEmoji(category.name);
+                    const bgColor = getCategoryBgColor(category.name);
+                    return (
+                      <Link
+                        key={category._id}
+                        href={`/resources?category=${encodeURIComponent(category.name)}`}
+                        className="card p-4 text-center hover:shadow-lg transition-all"
+                      >
+                        <div className={`w-12 h-12 ${bgColor} rounded-lg flex items-center justify-center mx-auto mb-3`}>
+                          <span className="text-2xl">{emoji}</span>
                         </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
-                <div className="flex flex-col items-center justify-center py-6">
-                  <FolderIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
-                  <p className="text-gray-500 dark:text-gray-500">暂无分类数据，请稍后再查看。</p>
+                        <h3 className="font-medium">{category.name}</h3>
+                        <p className="text-sm text-gray-500 mt-1">{category.resourceCount || 0} 个资源</p>
+                      </Link>
+                    );
+                  })}
                 </div>
-              </div>
-            )}
-          </div>
-
-          {/* 热门资源 */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">热门资源</h2>
-              <Link
-                href="/resources?sortBy=downloadCount&sortOrder=desc"
-                className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
-              >
-                查看更多 &rarr;
-              </Link>
+              ) : (
+                <div className="card p-8 text-center">
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <FolderIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
+                    <p className="text-gray-500 dark:text-gray-500">暂无分类数据，请稍后再查看。</p>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* 热门资源 */}
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">热门资源</h2>
+                <Link
+                  href="/resources?sortBy=downloadCount&sortOrder=desc"
+                  className="text-amber-800 hover:text-amber-900 flex items-center space-x-1"
+                >
+                  <span>查看更多</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </Link>
+              </div>
             {hotResources.length > 0 ? (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {hotResources.map((resource) => (
-                  <Link
-                    key={resource._id}
-                    href={`/resources/${resource._id}`}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow"
-                  >
-                    <div className="p-6">
-                      <div className="text-lg font-medium text-gray-900 dark:text-white">{resource.title}</div>
-                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{resource.description}</p>
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                          {getCategoryName(resource.category)}
-                        </span>
-                        <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                          <span>{resource.downloadCount || 0} 次下载</span>
-                        </div>
-                      </div>
+                  <div key={resource._id} className="card p-6">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold">{resource.title}</h3>
+                      <FavoriteButton
+                        resourceId={resource._id}
+                        initialIsFavorite={resource.isFavorite}
+                        className="p-1"
+                      />
                     </div>
-                  </Link>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{resource.description || '暂无描述'}</p>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="rating-stars">★★★★★</div>
+                        <span className="text-sm text-gray-500">
+                          {resource.rating ? resource.rating.toFixed(1) : '0'}
+                        </span>
+                      </div>
+                      <span className="text-sm text-gray-500">访问 {resource.downloadCount || 0}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      <span className="tag">{getCategoryName(resource.category)}</span>
+                      {resource.tags && resource.tags.slice(0, 2).map((tag, index) => (
+                        <span key={index} className="tag">{tag}</span>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        {typeof resource.uploader === 'object' ? (
+                          <div className="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs font-medium">
+                            {resource.uploader.username ? resource.uploader.username.charAt(0).toUpperCase() : 'U'}
+                          </div>
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-gray-500 text-white flex items-center justify-center text-xs font-medium">
+                            U
+                          </div>
+                        )}
+                        <span className="text-sm text-gray-600">
+                          {typeof resource.uploader === 'object' ? resource.uploader.username : '未知用户'}
+                        </span>
+                      </div>
+                      <Link href={`/resources/${resource._id}`} className="btn-primary text-sm px-4 py-2">访问资源</Link>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
+              <div className="card p-8 text-center">
                 <div className="flex flex-col items-center justify-center py-6">
                   <InformationCircleIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
                   <p className="text-gray-500 dark:text-gray-500">暂无热门资源，请稍后再查看。</p>
@@ -238,76 +263,94 @@ export default function Home() {
             )}
           </div>
 
-          {/* 最新资源 */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">最新资源</h2>
-              <Link
-                href="/resources?sortBy=createdAt&sortOrder=desc"
-                className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
-              >
-                查看更多 &rarr;
-              </Link>
-            </div>
-            {latestResources.length > 0 ? (
-              <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-                <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+            {/* 最新资源 */}
+            <div className="mt-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold">最新资源</h2>
+                <Link
+                  href="/resources?sortBy=createdAt&sortOrder=desc"
+                  className="text-amber-800 hover:text-amber-900 flex items-center space-x-1"
+                >
+                  <span>查看更多</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </Link>
+              </div>
+              {latestResources.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {latestResources.map((resource) => (
-                    <li key={resource._id}>
-                      <Link
-                        href={`/resources/${resource._id}`}
-                        className="block hover:bg-gray-50 dark:hover:bg-gray-700"
-                      >
-                        <div className="px-6 py-4">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="text-lg font-medium text-gray-900 dark:text-white">{resource.title}</div>
-                              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{resource.description}</p>
-                            </div>
-                            <div className="flex items-center space-x-4">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                                {getCategoryName(resource.category)}
-                              </span>
-                              <span className="text-sm text-gray-500 dark:text-gray-400">
-                                {new Date(resource.createdAt).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
+                    <div key={resource._id} className="card p-6">
+                      <div className="flex items-start justify-between mb-2">
+                        <h3 className="font-semibold">{resource.title}</h3>
+                        <FavoriteButton
+                          resourceId={resource._id}
+                          initialIsFavorite={resource.isFavorite}
+                          className="p-1"
+                        />
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">{resource.description || '暂无描述'}</p>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                          <div className="rating-stars">★★★★★</div>
+                          <span className="text-sm text-gray-500">
+                            {resource.rating ? resource.rating.toFixed(1) : '0'}
+                          </span>
                         </div>
-                      </Link>
-                    </li>
+                        <span className="text-sm text-gray-500">访问 {resource.downloadCount || 0}</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        <span className="tag">{getCategoryName(resource.category)}</span>
+                        {resource.tags && resource.tags.slice(0, 2).map((tag, index) => (
+                          <span key={index} className="tag">{tag}</span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          {typeof resource.uploader === 'object' ? (
+                            <div className="w-6 h-6 rounded-full bg-amber-600 text-white flex items-center justify-center text-xs font-medium">
+                              {resource.uploader.username ? resource.uploader.username.charAt(0).toUpperCase() : 'U'}
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-gray-500 text-white flex items-center justify-center text-xs font-medium">
+                              U
+                            </div>
+                          )}
+                          <span className="text-sm text-gray-600">
+                            {typeof resource.uploader === 'object' ? resource.uploader.username : '未知用户'}
+                          </span>
+                        </div>
+                        <Link href={`/resources/${resource._id}`} className="btn-primary text-sm px-4 py-2">访问资源</Link>
+                      </div>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            ) : (
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
-                <div className="flex flex-col items-center justify-center py-6">
-                  <InformationCircleIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
-                  <p className="text-gray-500 dark:text-gray-500">暂无最新资源，请稍后再查看。</p>
                 </div>
-              </div>
-            )}
-          </div>
+              ) : (
+                <div className="card p-8 text-center">
+                  <div className="flex flex-col items-center justify-center py-6">
+                    <BookOpenIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-4" />
+                    <p className="text-gray-500 dark:text-gray-500">暂无最新资源，请稍后再查看。</p>
+                  </div>
+                </div>
+              )}
+            </div>
 
-          {/* 上传资源号召性按钮 */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
-            <div className="bg-indigo-50 dark:bg-indigo-900/30 rounded-lg shadow-sm p-8">
-              <h2 className="text-2xl font-bold text-indigo-700 dark:text-indigo-300 mb-4">
-                分享您的知识和资源
-              </h2>
-              <p className="text-indigo-600 dark:text-indigo-400 mb-6 max-w-2xl mx-auto">
-                通过上传资源，您可以帮助更多人获取知识，同时也能获得社区的认可和支持。
+            {/* 分享知识和资源区块 */}
+            <div className="mt-16 bg-gradient-to-r from-indigo-900 via-purple-900 to-indigo-800 rounded-2xl p-12 text-center text-white">
+              <h2 className="text-3xl font-bold mb-4">分享您的知识和资源</h2>
+              <p className="text-lg text-indigo-200 mb-8 max-w-2xl mx-auto">
+                通过上传资源，您可以让更多学人获取知识，同时也能获得社区的认可和支持。
               </p>
               <Link
                 href="/resources/new"
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 inline-block"
               >
                 上传资源
               </Link>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </main>
     </div>
   );
 }

@@ -176,9 +176,16 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     setUrlError(null);
     setCategoryError(null);
     setTagsError(null);
+    setServerDescriptionError(null);
 
     if (!title.trim()) {
       setTitleError('标题不能为空。');
+      isValid = false;
+    } else if (title.trim().length < 3) {
+      setTitleError('标题至少需要3个字符。');
+      isValid = false;
+    } else if (title.trim().length > 200) {
+      setTitleError('标题不能超过200个字符。');
       isValid = false;
     }
 
@@ -190,13 +197,19 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       isValid = false;
     }
 
-    // 新增：分类选择验证
+    // 分类选择验证
     if (!category) {
       setCategoryError('请选择一个分类。');
       isValid = false;
     }
 
-    // 新增：标签验证
+    // 描述验证
+    if (!description.trim()) {
+      setServerDescriptionError('资源描述不能为空。');
+      isValid = false;
+    }
+
+    // 标签验证
     const tags = tagsString
       .split(/[,\s]+/) // 按逗号或空格分割
       .map(tag => tag.trim())
@@ -206,6 +219,7 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
       setTagsError('每个标签不能超过5个字。');
       isValid = false;
     }
+    
     // 如果输入框不为空，但解析后没有有效标签 (例如只有逗号或空格)
     if (tagsString.trim() !== '' && tags.length === 0) {
         setTagsError('请输入有效的标签。');
@@ -217,9 +231,12 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // 在提交前清除客户端错误，以便validateForm可以重新设置它们
+    // 在提交前清除所有客户端错误
+    setTitleError(null);
+    setUrlError(null);
     setCategoryError(null);
     setTagsError(null);
+    setServerDescriptionError(null);
 
     if (!validateForm()) {
       return;
@@ -237,130 +254,127 @@ const ResourceForm: React.FC<ResourceFormProps> = ({
     }
 
     const resourceData: CreateResourceData = {
-      title,
-      url,
-      link: url,  // 同时提供link字段
-      description,
+      title: title.trim(),
+      url: url.trim(),
+      link: url.trim(),
+      description: description.trim(),
       category,
       tags: finalTags,
     };
 
     try {
+      console.log('提交资源数据:', resourceData);
       await onSubmit(resourceData);
     } catch (error) {
-      console.error('Error in form submission handler:', error);
+      console.error('表单提交处理器中的错误:', error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-gray-800 p-8 rounded-lg">
-      {/* Display other server errors */}
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* 显示服务器返回的其他错误 */}
       {otherServerErrors.length > 0 && (
-        <div className="rounded-md bg-red-900 p-4 mb-4 border border-red-700">
-          <div className="ml-3">
-            <h3 className="text-sm font-medium text-white">请更正以下错误：</h3>
-            <ul className="list-disc list-inside text-sm text-red-300">
-              {otherServerErrors.map((errMsg, index) => (
-                <li key={`server-other-${index}`}>{errMsg}</li>
-              ))}
-            </ul>
-          </div>
+        <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-4">
+          <p className="text-red-600 dark:text-red-400 font-medium">请修正以下错误：</p>
+          <ul className="list-disc list-inside mt-1 text-red-500">
+            {otherServerErrors.map((err, idx) => (
+              <li key={`other-error-${idx}`} className="text-sm">{err}</li>
+            ))}
+          </ul>
         </div>
       )}
+      
+      {/* 基本信息 */}
+      <div className="card p-6">
+        <h2 className="text-xl font-semibold mb-4">基本信息</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium mb-2">资源标题 *</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={`input-field w-full ${titleError || serverTitleError ? 'border-red-500' : ''}`}
+              placeholder="请输入资源标题"
+            />
+            {(titleError || serverTitleError) && (
+              <p className="text-red-500 text-sm mt-1">{titleError || serverTitleError}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">资源分类 *</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className={`input-field w-full ${categoryError || serverCategoryError ? 'border-red-500' : ''}`}
+            >
+              <option value="">请选择分类</option>
+              {categories.map((cat) => (
+                <option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            {(categoryError || serverCategoryError) && (
+              <p className="text-red-500 text-sm mt-1">{categoryError || serverCategoryError}</p>
+            )}
+          </div>
+        </div>
 
-      <div>
-        <label htmlFor="title" className="block text-sm font-bold text-white mb-1">
-          标题 <span className="text-red-400">*</span>
-        </label>
-        <input
-          type="text"
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${(titleError || serverTitleError) ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
-        />
-        {titleError && <p className="mt-1 text-xs text-red-400 font-medium">{titleError}</p>}
-        {serverTitleError && <p className="mt-1 text-xs text-red-400 font-medium">{serverTitleError}</p>}
+        <div className="mt-6">
+          <label className="block text-sm font-medium mb-2">资源描述 *</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className={`input-field w-full h-32 ${serverDescriptionError ? 'border-red-500' : ''}`}
+            placeholder="请详细描述资源内容、用途和特点"
+          />
+          {serverDescriptionError && (
+            <p className="text-red-500 text-sm mt-1">{serverDescriptionError}</p>
+          )}
+        </div>
+
+        <div className="mt-6">
+          <label className="block text-sm font-medium mb-2">标签 (用空格分隔多个标签)</label>
+          <input
+            type="text"
+            value={tagsString}
+            onChange={(e) => setTagsString(e.target.value)}
+            className={`input-field w-full ${tagsError || serverTagsError ? 'border-red-500' : ''}`}
+            placeholder="例如: 文学 古典 教育 诗歌"
+          />
+          <p className="text-sm text-gray-500 mt-1">输入相关标签，用空格分隔，有助于其他用户找到您的资源</p>
+          {(tagsError || serverTagsError) && (
+            <p className="text-red-500 text-sm mt-1">{tagsError || serverTagsError}</p>
+          )}
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="url" className="block text-sm font-bold text-white mb-1">
-          链接 <span className="text-red-400">*</span>
-        </label>
-        <input
-          type="url"
-          id="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://example.com/resource"
-          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${(urlError || serverUrlError) ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
-        />
-        {urlError && <p className="mt-1 text-xs text-red-400 font-medium">{urlError}</p>}
-        {serverUrlError && <p className="mt-1 text-xs text-red-400 font-medium">{serverUrlError}</p>}
+      {/* 资源链接 */}
+      <div className="card p-6">
+        <h2 className="text-xl font-semibold mb-4">资源链接</h2>
+        <div>
+          <label className="block text-sm font-medium mb-2">资源链接 *</label>
+          <input
+            type="url"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className={`input-field w-full ${urlError || serverUrlError ? 'border-red-500' : ''}`}
+            placeholder="请输入资源的访问链接，如：https://example.com/resource"
+          />
+          <p className="text-sm text-gray-500 mt-1">请确保链接有效且可以正常访问</p>
+          {(urlError || serverUrlError) && (
+            <p className="text-red-500 text-sm mt-1">{urlError || serverUrlError}</p>
+          )}
+        </div>
       </div>
 
-      <div>
-        <label htmlFor="description" className="block text-sm font-bold text-white mb-1">
-          描述
-        </label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${serverDescriptionError ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
-        />
-        {serverDescriptionError && <p className="mt-1 text-xs text-red-400 font-medium">{serverDescriptionError}</p>}
-      </div>
-
-      <div>
-        <label htmlFor="category" className="block text-sm font-bold text-white mb-1">
-          分类 <span className="text-red-400">*</span>
-        </label>
-        <select
-          id="category"
-          value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
-            setCategoryError(null);
-          }}
-          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${(categoryError || serverCategoryError) ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
-        >
-          <option value="">请选择一个分类</option>
-          {categories.map((cat) => (
-            <option key={cat._id} value={cat._id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-        {categoryError && <p className="mt-1 text-xs text-red-400 font-medium">{categoryError}</p>}
-        {serverCategoryError && <p className="mt-1 text-xs text-red-400 font-medium">{serverCategoryError}</p>}
-      </div>
-
-      <div>
-        <label htmlFor="tags" className="block text-sm font-bold text-white mb-1">
-          标签 (逗号或空格分隔，每个标签最多5个字)
-        </label>
-        <input
-          type="text"
-          id="tags"
-          value={tagsString}
-          onChange={(e) => {
-            setTagsString(e.target.value);
-            setTagsError(null);
-          }}
-          className={`mt-1 block w-full px-3 py-2 bg-gray-700 border rounded-md shadow-sm focus:outline-none sm:text-sm text-white ${(tagsError || serverTagsError) ? 'border-red-500 focus:ring-red-400 focus:border-red-400' : 'border-gray-600 focus:ring-blue-500 focus:border-blue-500'}`}
-          placeholder="例如：js, react, 教程"
-        />
-        {tagsError && <p className="mt-1 text-xs text-red-400 font-medium">{tagsError}</p>}
-        {serverTagsError && <p className="mt-1 text-xs text-red-400 font-medium">{serverTagsError}</p>}
-      </div>
-
-      <div>
+      {/* 提交按钮 */}
+      <div className="flex justify-end">
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          className="btn-primary"
         >
           {isLoading ? '提交中...' : submitButtonText}
         </button>

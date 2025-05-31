@@ -4,7 +4,6 @@ import {
   updateUserProfile,
   uploadAvatar,
   getUserUploads,
-  getUserFavorites,
   getUserStats,
   getAvatar
 } from '../controllers/user.controller';
@@ -56,6 +55,11 @@ const userIdValidationRules = () => [
   }),
 ];
 
+// 用户ID验证规则 (用于 :userId 参数)
+const userIdValidationRulesForUserId = () => [
+  param('userId').isMongoId().withMessage('无效的用户ID格式'),
+];
+
 // 用户资料更新验证规则
 const userProfileUpdateValidationRules = () => [
   body('username')
@@ -70,6 +74,8 @@ const userProfileUpdateValidationRules = () => [
 
 
 
+// 具体路由放在前面，避免被通用路由匹配
+
 // 获取用户资料
 router.get('/profile/:id', userIdValidationRules(), validate, getUserProfile);
 
@@ -82,6 +88,15 @@ router.put(
   validate,
   updateUserProfile
 );
+
+// 获取用户上传的资源
+router.get('/uploads/:userId', userIdValidationRulesForUserId(), validate, getUserUploads);
+
+// 注意：获取用户收藏的功能已经在 /api/favorites 路由中实现
+// 这个路由已被移除以避免功能重复和验证问题
+// router.get('/favorites/:userId', protect, userIdValidationRulesForUserId(), validate, getUserFavorites);
+
+// 通用路由放在后面
 
 // 上传用户头像 (需要认证)
 router.post(
@@ -96,13 +111,7 @@ router.post(
 // 获取用户头像
 router.get('/:id/avatar', getAvatar);
 
-// 获取用户上传的资源
-router.get('/uploads/:userId', userIdValidationRules(), validate, getUserUploads);
-
-// 获取用户收藏的资源 (需要认证)
-router.get('/favorites/:userId', protect, userIdValidationRules(), validate, getUserFavorites);
-
-// 获取用户活动统计数据 (需要认证)
+// 获取用户活动统计数据 (需要认证) - 放在最后，避免与其他路由冲突
 router.get('/:id/stats', protect, userIdValidationRules(), validate, getUserStats);
 
 export default router;

@@ -291,11 +291,6 @@ export const getUserFavorites = async (req: AuthenticatedRequest, res: Response,
     const userId = req.params.userId;
     const currentUserId = req.user?.id;
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      res.status(400).json({ message: '无效的用户ID格式' });
-      return;
-    }
-
     // 检查是否是当前用户
     if (userId !== currentUserId) {
       res.status(403).json({ message: '没有权限查看其他用户的收藏' });

@@ -5,11 +5,21 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Bars3Icon, XMarkIcon, SunIcon, MoonIcon } from '@heroicons/react/24/outline';
+import {
+  Bars3Icon,
+  XMarkIcon,
+  SunIcon,
+  MoonIcon,
+  HomeIcon,
+  FolderIcon,
+  TagIcon,
+  RectangleStackIcon
+} from '@heroicons/react/24/outline';
 
 const Navbar: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -54,18 +64,27 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
+        setIsUserDropdownOpen(false);
       }
     };
 
-    if (isMenuOpen) {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsUserDropdownOpen(false);
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isUserDropdownOpen || isMobileMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscapeKey);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
     };
-  }, [isMenuOpen]);
+  }, [isUserDropdownOpen, isMobileMenuOpen]);
 
   // 切换暗色/亮色模式
   const toggleDarkMode = () => {
@@ -125,98 +144,188 @@ const Navbar: React.FC = () => {
     );
   };
 
-  // 导航链接
+  // 导航链接 - 根据原型设计整合四个主要导航
   const navLinks = [
-    { href: '/', label: '首页' },
-    { href: '/resources', label: '资源' },
-    { href: '/categories', label: '分类' },
-    { href: '/tags', label: '标签' },
+    { href: '/', label: '首页', icon: HomeIcon },
+    { href: '/resources', label: '资源库', icon: FolderIcon },
+    { href: '/categories', label: '分类', icon: RectangleStackIcon },
+    { href: '/tags', label: '标签', icon: TagIcon },
   ];
 
-  // 用户菜单链接
-  const userMenuLinks = [
-    { href: '/profile', label: '个人中心' },
-    { href: '/profile/uploads', label: '我的上传' },
-    { href: '/profile/favorites', label: '我的收藏' },
-  ];
+  // 用户菜单链接 - 移除了"我的上传"和"我的收藏"，因为已集成到个人中心页面
+  const userMenuLinks: { href: string; label: string }[] = [];
 
   return (
-    <nav className="bg-card shadow-sm border-b border-border">
+    <>
+      <style jsx global>{`
+        @media (min-width: 640px) {
+          #desktop-nav {
+            display: block !important;
+          }
+          #mobile-menu-btn {
+            display: none !important;
+          }
+          #mobile-menu {
+            display: none !important;
+          }
+        }
+        @media (max-width: 639px) {
+          #desktop-nav {
+            display: none !important;
+          }
+          #mobile-menu-btn {
+            display: flex !important;
+          }
+          #mobile-menu {
+            display: block !important;
+          }
+        }
+      `}</style>
+      <nav className="card border-b border-gray-200 dark:border-gray-700 mb-0 rounded-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
-            {/* Logo */}
+          {/* Logo和主导航 */}
+          <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/" className="flex items-center space-x-2">
-                <img src="/logo.png" alt="logo" height={32} width={32} className="h-8 w-8 object-contain" />
-                <span className="text-xl font-bold text-gray-900 dark:text-white">文明</span>
+              <Link href="/" className="flex items-center">
+                <div className="w-8 h-8 bg-amber-800 rounded-lg flex items-center justify-center mr-3">
+                  <span className="text-white font-bold">文</span>
+                </div>
+                <span className="text-xl font-bold text-amber-800">文明资源平台</span>
               </Link>
             </div>
-
-            {/* 桌面端导航链接 */}
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {navLinks.map((link) => (
+            {/* 桌面端导航菜单 - 使用内联媒体查询 */}
+            <div
+              className="ml-6"
+              style={{
+                display: 'none'
+              }}
+              id="desktop-nav"
+            >
+              <div className="flex space-x-4">
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                    pathname === link.href
-                      ? 'border-primary text-foreground'
-                      : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
-                  }`}
+                  href="/"
+                  className={`nav-link ${pathname === '/' ? 'active' : ''}`}
                 >
-                  {link.label}
+                  首页
                 </Link>
-              ))}
+                <Link
+                  href="/resources"
+                  className={`nav-link ${pathname === '/resources' ? 'active' : ''}`}
+                >
+                  资源库
+                </Link>
+                <Link
+                  href="/categories"
+                  className={`nav-link ${pathname === '/categories' ? 'active' : ''}`}
+                >
+                  分类
+                </Link>
+                <Link
+                  href="/tags"
+                  className={`nav-link ${pathname === '/tags' ? 'active' : ''}`}
+                >
+                  标签
+                </Link>
+              </div>
             </div>
+
+
           </div>
 
-          {/* 右侧工具栏 */}
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-            {/* 主题切换按钮 */}
-            <ThemeToggle />
+          {/* 右侧功能区 */}
+          <div className="flex items-center space-x-4">
+            {/* 主题切换 */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              title={isDarkMode ? "切换到亮色模式" : "切换到暗色模式"}
+            >
+              {mounted && (
+                isDarkMode ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                  </svg>
+                )
+              )}
+            </button>
+
+            {/* 搜索框 */}
+            <div className="relative hidden lg:block">
+              <input
+                type="text"
+                placeholder="搜索资源..."
+                className="input-field w-64 pl-10"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const query = (e.target as HTMLInputElement).value.trim();
+                    if (query) {
+                      window.location.href = `/resources?q=${encodeURIComponent(query)}`;
+                    }
+                  }
+                }}
+              />
+              <svg className="w-5 h-5 absolute left-3 top-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
 
             {/* 用户菜单 */}
             {isAuthenticated ? (
               <div className="relative" ref={dropdownRef}>
                 <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none transition-colors duration-200"
+                  id="user-menu-btn"
+                  onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                  className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <span className="text-sm font-semibold">{user?.username}</span>
-                  <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden border-2 border-gray-300 dark:border-gray-600">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user?._id}/avatar?t=${Date.now()}`}
-                      alt={user?.username || '用户头像'}
-                      width={32}
-                      height={32}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user?._id}/avatar?t=${Date.now()}`}
+                    alt="用户头像"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <span className="hidden md:block">{user?.username}</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
                 </button>
 
-                {/* 下拉菜单 */}
-                {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 ring-1 ring-black ring-opacity-5 z-50">
-                    {/* 菜单项 */}
-                    <div className="py-1">
-                      {userMenuLinks.map((link) => (
-                        <Link
-                          key={link.href}
-                          href={link.href}
-                          className="block px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                      <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                {/* 用户下拉菜单 */}
+                {isUserDropdownOpen && (
+                  <div id="user-dropdown" className="dropdown right-0 mt-2 w-48 py-2">
+                    <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-600">
+                      <p className="text-sm font-medium">{user?.username}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                    </div>
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      个人中心
+                    </Link>
+                    {userMenuLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => setIsUserDropdownOpen(false)}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                    <div className="border-t border-gray-200 dark:border-gray-600 mt-2 pt-2">
                       <button
                         onClick={() => {
                           logout();
-                          setIsMenuOpen(false);
+                          setIsUserDropdownOpen(false);
                         }}
-                        className="block w-full text-left px-4 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-150"
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
                         退出登录
                       </button>
@@ -228,13 +337,13 @@ const Navbar: React.FC = () => {
               <div className="flex items-center space-x-4">
                 <Link
                   href="/auth/login"
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
                 >
                   登录
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                  className="btn-primary text-sm px-4 py-2"
                 >
                   注册
                 </Link>
@@ -242,13 +351,17 @@ const Navbar: React.FC = () => {
             )}
           </div>
 
-          {/* 移动端菜单按钮 */}
-          <div className="flex items-center sm:hidden">
+          {/* 移动端菜单按钮 - 640px以下显示 */}
+          <div
+            className="flex items-center"
+            style={{ display: 'none' }}
+            id="mobile-menu-btn"
+          >
             <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-gray-800 transition-colors"
             >
-              {isMenuOpen ? (
+              {isMobileMenuOpen ? (
                 <XMarkIcon className="block h-6 w-6" />
               ) : (
                 <Bars3Icon className="block h-6 w-6" />
@@ -258,95 +371,64 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* 移动端菜单 */}
-      {isMenuOpen && (
-        <div className="sm:hidden bg-card">
-          <div className="pt-2 pb-3 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                  pathname === link.href
-                    ? 'border-primary text-primary bg-accent/50'
-                    : 'border-transparent text-muted-foreground hover:bg-accent hover:border-border hover:text-foreground'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            {/* 移动端主题切换按钮 */}
-            <MobileThemeToggle />
+      {/* 移动端菜单 - 640px以下显示，只显示导航项 */}
+      {isMobileMenuOpen && (
+        <div
+          className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 relative z-50"
+          style={{ display: 'none' }}
+          id="mobile-menu"
+        >
+          {/* 移动端导航项 */}
+          <div className="py-3 space-y-1">
+            <Link
+              href="/"
+              className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium transition-colors ${
+                pathname === '/'
+                  ? 'border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-900/20'
+                  : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white'
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              首页
+            </Link>
+            <Link
+              href="/resources"
+              className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium transition-colors ${
+                pathname === '/resources'
+                  ? 'border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-900/20'
+                  : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white'
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              资源库
+            </Link>
+            <Link
+              href="/categories"
+              className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium transition-colors ${
+                pathname === '/categories'
+                  ? 'border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-900/20'
+                  : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white'
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              分类
+            </Link>
+            <Link
+              href="/tags"
+              className={`block pl-3 pr-4 py-3 border-l-4 text-base font-medium transition-colors ${
+                pathname === '/tags'
+                  ? 'border-amber-500 text-amber-600 bg-amber-50 dark:bg-amber-900/20'
+                  : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white'
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              标签
+            </Link>
           </div>
-
-          {/* 移动端用户菜单 */}
-          {isAuthenticated ? (
-            <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center px-4">
-                <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${user?._id}/avatar?t=${Date.now()}`}
-                      alt={user?.username || '用户头像'}
-                      width={40}
-                      height={40}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                </div>
-                <div className="ml-3">
-                  <div className="text-base font-medium text-gray-800 dark:text-white">
-                    {user?.username}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3 space-y-1">
-                {userMenuLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="block px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-4 py-2 text-base font-medium text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
-                >
-                  退出登录
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
-              <div className="flex items-center px-4 space-x-4">
-                <Link
-                  href="/auth/login"
-                  className="block w-full text-center px-4 py-2 text-base font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  登录
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className="block w-full text-center px-4 py-2 text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  注册
-                </Link>
-              </div>
-            </div>
-          )}
         </div>
       )}
-    </nav>
+      </nav>
+    </>
   );
 };
 

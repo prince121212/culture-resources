@@ -197,40 +197,51 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
   };
 
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-        评论 ({totalComments})
-      </h2>
+    <div>
+      <div className="flex items-center mb-6">
+        <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
+          <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-2.66-.4c-.54-.18-1.12-.3-1.34-.3-.44 0-.84.04-1.23.14C6.09 19.95 4 18.5 4 16.5c0-1.38.8-2.63 2-3.27V12a8 8 0 018-8c4.418 0 8 3.582 8 8z"></path>
+          </svg>
+        </div>
+        <h2 className="text-xl font-bold text-gray-900">
+          评论 ({totalComments})
+        </h2>
+      </div>
 
       {/* 评论表单 */}
       {isAuthenticated ? (
-        <form onSubmit={handleSubmitComment} className="mb-8">
-          <div className="mb-4">
-            <label htmlFor="comment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              发表评论
-            </label>
-            <textarea
-              id="comment"
-              rows={4}
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
-              placeholder="写下你的评论..."
-            />
+        <div className="mb-8 bg-white rounded-xl shadow-sm border border-amber-100 overflow-hidden">
+          <div className="border-b border-amber-100 px-6 py-4">
+            <h3 className="font-semibold text-gray-800">发表评论</h3>
           </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-          >
-            {isSubmitting ? '提交中...' : '发表评论'}
-          </button>
-        </form>
+          <form onSubmit={handleSubmitComment} className="p-6">
+            <div className="mb-4">
+              <textarea
+                id="comment"
+                rows={4}
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
+                placeholder="写下你的评论..."
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all disabled:opacity-50"
+              >
+                {isSubmitting ? '提交中...' : '发表评论'}
+              </button>
+            </div>
+          </form>
+        </div>
       ) : (
-        <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p className="text-gray-600 dark:text-gray-400">
+        <div className="mb-8 p-6 bg-amber-50 rounded-xl border border-amber-100">
+          <p className="text-amber-800">
             请
-            <a href="/auth/login" className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+            <a href="/auth/login" className="text-orange-600 hover:text-orange-700 font-medium mx-1">
               登录
             </a>
             后发表评论
@@ -240,63 +251,79 @@ export default function CommentSection({ resourceId, onCommentAdded }: CommentSe
 
       {/* 评论列表 */}
       {isLoading ? (
-        <div className="text-center py-4">加载评论中...</div>
+        <div className="text-center py-8">
+          <div className="inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-2 text-amber-700">加载评论中...</p>
+        </div>
       ) : error ? (
-        <div className="text-center text-red-500 py-4">{error}</div>
+        <div className="text-center text-red-500 bg-red-50 rounded-xl p-6 border border-red-100">
+          <svg className="w-8 h-8 text-red-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <p>{error}</p>
+        </div>
       ) : comments.length === 0 ? (
-        <div className="text-center text-gray-500 dark:text-gray-400 py-4">
-          暂无评论，快来发表第一条评论吧！
+        <div className="text-center py-12 bg-white rounded-xl border border-amber-100 shadow-sm">
+          <svg className="w-12 h-12 text-amber-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-2.66-.4c-.54-.18-1.12-.3-1.34-.3-.44 0-.84.04-1.23.14C6.09 19.95 4 18.5 4 16.5c0-1.38.8-2.63 2-3.27V12a8 8 0 018-8c4.418 0 8 3.582 8 8z"></path>
+          </svg>
+          <p className="text-gray-500 text-lg">暂无评论，快来发表第一条评论吧！</p>
         </div>
       ) : (
         <>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {comments.map((comment) => (
               <div
                 key={comment._id}
-                className="bg-white dark:bg-gray-800 shadow rounded-lg p-6"
+                className="bg-white rounded-xl p-5 border border-amber-100 shadow-sm transition-shadow hover:shadow"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center space-x-3">
                     <div className="flex-shrink-0">
-                      <Image
-                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${comment.author._id}/avatar`}
-                        alt={comment.author.username}
-                        width={40}
-                        height={40}
-                        className="rounded-full object-cover"
-                        style={{ width: '40px', height: '40px' }}
-                      />
+                      {comment.author.avatar ? (
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/users/${comment.author._id}/avatar`}
+                          alt={comment.author.username}
+                          width={40}
+                          height={40}
+                          className="rounded-full object-cover border-2 border-amber-200"
+                          style={{ width: '40px', height: '40px' }}
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold border-2 border-amber-200">
+                          {comment.author.username ? comment.author.username.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                      )}
                     </div>
                     <div>
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+                      <div className="font-medium text-gray-900">
                         {comment.author.username}
+                      </div>
+                      <div className="text-xs text-amber-600">
+                        {formatDate(comment.createdAt)}
                       </div>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {formatDate(comment.createdAt)}
-                  </div>
-                </div>
-                <div className="mt-4 text-gray-700 dark:text-gray-300">
-                  {comment.content}
-                </div>
-                {user?._id === comment.author._id && (
-                  <div className="mt-4 flex justify-end">
+                  
+                  {user?._id === comment.author._id && (
                     <button
                       onClick={() => handleDeleteComment(comment._id)}
-                      className="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                      className="text-xs text-red-500 hover:text-red-700 transition-colors"
                     >
                       删除
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
+                <div className="mt-3 text-gray-700 pl-12">
+                  {comment.content}
+                </div>
               </div>
             ))}
           </div>
 
           {/* 分页控件 */}
           {totalPages > 1 && (
-            <div className="mt-8">
+            <div className="mt-6">
               <PaginationControls
                 currentPage={page}
                 totalPages={totalPages}

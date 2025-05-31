@@ -64,14 +64,18 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
       const result = await toggleFavorite(resourceId, isFavorite, token);
       setIsFavorite(result.isFavorite);
       toast.success(result.message);
-      
+
       // 通知父组件状态变化
       if (onToggle) {
         onToggle(result.isFavorite);
       }
     } catch (error) {
       console.error('切换收藏状态失败', error);
-      toast.error('操作失败，请稍后重试');
+      if (error instanceof Error) {
+        toast.error(`操作失败: ${error.message}`);
+      } else {
+        toast.error('操作失败，请稍后重试');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -81,14 +85,15 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     <button
       onClick={handleToggleFavorite}
       disabled={isLoading}
-      className={`focus:outline-none ${className}`}
+      className={`focus:outline-none transition-all duration-200 hover:scale-110 border-0 ${className}`}
       aria-label={isFavorite ? '取消收藏' : '收藏'}
       title={isFavorite ? '取消收藏' : '收藏'}
+      style={{ zIndex: 1000, position: 'relative' }}
     >
       {isFavorite ? (
-        <HeartSolid className="h-6 w-6 text-red-500" />
+        <HeartSolid className="h-8 w-8 text-red-500 drop-shadow-sm" />
       ) : (
-        <HeartOutline className="h-6 w-6 text-gray-500 hover:text-red-500 dark:text-gray-400 dark:hover:text-red-400" />
+        <HeartOutline className="h-8 w-8 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors duration-200" />
       )}
     </button>
   );
