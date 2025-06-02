@@ -15,6 +15,7 @@ export default function EditProfilePage() {
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [bio, setBio] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
@@ -27,6 +28,7 @@ export default function EditProfilePage() {
     if (currentUser) {
       setUsername(currentUser.username || '');
       setEmail(currentUser.email || '');
+      setBio(currentUser.bio || '');
     }
   }, [currentUser]);
 
@@ -71,6 +73,7 @@ export default function EditProfilePage() {
       const updateData: UpdateUserProfileData = {
         username,
         email,
+        bio,
       };
 
       // 更新用户资料
@@ -262,6 +265,30 @@ export default function EditProfilePage() {
             {getFieldError('email') && (
               <p className="text-red-500 text-xs italic mt-1">{getFieldError('email')}</p>
             )}
+          </div>
+
+          {/* 个人简介 */}
+          <div className="mb-6">
+            <label htmlFor="bio" className="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">
+              个人简介
+            </label>
+            <textarea
+              id="bio"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24 resize-vertical ${
+                getFieldError('bio') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+              }`}
+              disabled={isSubmitting}
+              placeholder="介绍一下自己..."
+              maxLength={500}
+            />
+            {getFieldError('bio') && (
+              <p className="text-red-500 text-xs italic mt-1">{getFieldError('bio')}</p>
+            )}
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              {bio.length}/500 字符
+            </p>
           </div>
 
           {/* 提交按钮 */}

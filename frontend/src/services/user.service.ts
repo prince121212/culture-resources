@@ -7,6 +7,7 @@ export interface UpdateUserProfileData {
   username?: string;
   email?: string;
   avatar?: string;
+  bio?: string;
   // 可以根据需要添加更多字段
 }
 

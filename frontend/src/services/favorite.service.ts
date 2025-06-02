@@ -159,3 +159,30 @@ export const toggleFavorite = async (
     throw new Error('切换收藏状态失败');
   }
 };
+
+/**
+ * 清空所有收藏
+ */
+export const clearAllFavorites = async (
+  token: string
+): Promise<{ message: string; deletedCount: number }> => {
+  const response = await fetch(`${API_BASE_URL}/favorites`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      '清空收藏失败',
+      { message: data.message || '清空收藏失败' }
+    );
+  }
+
+  return data as { message: string; deletedCount: number };
+};

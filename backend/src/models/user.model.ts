@@ -11,6 +11,7 @@ export interface IUser extends Document {
   points: number;
   status: string;
   avatar?: string; // 添加头像字段
+  bio?: string; // 添加个人简介字段
   createdAt?: Date;
   updatedAt?: Date;
   matchPassword(enteredPassword: string): Promise<boolean>; // Add method to interface
@@ -52,6 +53,12 @@ const UserSchema: Schema<IUser> = new Schema<IUser>(
     avatar: {
       type: String,
       default: null, // 将通过脚本设置默认头像的GridFS ID
+    },
+    bio: {
+      type: String,
+      trim: true,
+      maxlength: [500, '个人简介不能超过500个字符'],
+      default: '',
     },
   },
   {

@@ -9,13 +9,18 @@ export interface Uploader {
   email?: string; // Optional, as populated from backend
 }
 
+export interface Category {
+  _id: string;
+  name: string;
+}
+
 export interface Resource {
   _id: string;
   title: string;
   description?: string;
   link: string;
   uploader: Uploader | string; // Can be populated Uploader object or just ID string
-  category?: string;
+  category?: Category | string; // 支持Category对象或字符串ID
   tags?: string[];
   downloadCount: number;
   rating?: number; // 平均评分

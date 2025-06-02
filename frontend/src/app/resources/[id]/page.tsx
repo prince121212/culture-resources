@@ -74,22 +74,22 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
       {/* 左侧主要内容 */}
       <div className="lg:col-span-2 space-y-8">
         {/* 资源头部信息 */}
-        <div className="card p-8 bg-gradient-to-br from-white to-amber-25 border-amber-100">
+        <div className="card p-8 bg-white dark:bg-gray-900">
           {/* 标题区域 */}
           <div className="mb-8">
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
-                <h1 className="text-4xl font-bold mb-4 leading-tight text-gray-900">{resource.title}</h1>
+                <h1 className="text-4xl font-bold mb-4 leading-tight" style={{ color: 'var(--text-primary, #111827)' }}>{resource.title}</h1>
                 <div className="flex items-center space-x-6 mb-4">
                   <div className="flex items-center space-x-3">
-                    <div className="rating-stars text-2xl text-amber-500">★★★★★</div>
+                    <div className="rating-stars text-2xl" style={{ color: 'var(--text-amber, #d97706)' }}>★★★★★</div>
                     <div className="flex flex-col">
-                      <span className="text-xl font-bold text-gray-900">{resource.rating ? resource.rating.toFixed(1) : '0'}</span>
-                      <span className="text-sm text-gray-500">{resource.ratingCount || 0} 评价</span>
+                      <span className="text-xl font-bold" style={{ color: 'var(--text-primary, #111827)' }}>{resource.rating ? resource.rating.toFixed(1) : '0'}</span>
+                      <span className="text-sm" style={{ color: 'var(--text-secondary, #6b7280)' }}>{resource.ratingCount || 0} 评价</span>
                     </div>
                   </div>
-                  <div className="h-8 w-px bg-gray-300"></div>
-                  <div className="flex items-center space-x-2 text-gray-600">
+                  <div className="h-8 w-px" style={{ backgroundColor: 'var(--border-color, #e5e7eb)' }}></div>
+                  <div className="flex items-center space-x-2" style={{ color: 'var(--text-secondary, #6b7280)' }}>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -101,29 +101,24 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
               <div className="flex items-center space-x-3 ml-8">
                 <FavoriteButton
                   resourceId={resource._id}
-                  className="p-4 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-all hover:scale-105 shadow-sm"
+                  className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-300 transition-all hover:scale-105 shadow-sm"
                 />
-                <button className="p-4 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition-all hover:scale-105 shadow-sm">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
-                  </svg>
-                </button>
               </div>
             </div>
           </div>
 
           {/* 资源描述 */}
           {resource.description && (
-            <div className="mb-8 p-6 bg-white rounded-xl border border-amber-100">
+            <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-xl border border-amber-100 dark:border-gray-700">
               <div className="flex items-center mb-4">
-                <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">资源介绍</h3>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary, #111827)' }}>资源介绍</h3>
               </div>
-              <p className="text-gray-700 leading-relaxed text-lg">{resource.description}</p>
+              <p className="leading-relaxed text-lg" style={{ color: 'var(--text-primary, #111827)' }}>{resource.description}</p>
             </div>
           )}
 
@@ -131,16 +126,20 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
           {resource.tags && resource.tags.length > 0 && (
             <div className="mb-8">
               <div className="flex items-center mb-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mr-3">
+                  <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">相关标签</h3>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary, #111827)' }}>相关标签</h3>
               </div>
               <div className="flex flex-wrap gap-3">
                 {resource.tags.map((tag, index) => (
-                  <span key={index} className="px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-medium hover:bg-amber-200 transition-colors cursor-pointer">{tag}</span>
+                  <span key={index} className="px-4 py-2 rounded-full text-sm font-medium hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors cursor-pointer" 
+                    style={{ 
+                      backgroundColor: 'var(--tag-bg, #fef3c7)',
+                      color: 'var(--tag-text, #92400e)'
+                    }}>{tag}</span>
                 ))}
               </div>
             </div>
@@ -161,7 +160,6 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
               立即访问资源
               <div className="absolute inset-0 rounded-2xl bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
             </a>
-            <p className="text-sm text-gray-500 mt-3">点击即可访问完整资源内容</p>
           </div>
         </div>
       </div>
@@ -169,9 +167,9 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
       {/* 右侧信息栏 */}
       <div className="lg:col-span-1 space-y-6">
         {/* 上传者信息 */}
-        <div className="card p-6 bg-gradient-to-br from-white to-amber-25 border-amber-200 shadow-lg">
-          <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-            <svg className="w-5 h-5 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="card p-6 shadow-lg bg-white dark:bg-gray-900">
+          <h3 className="text-lg font-bold mb-4 flex items-center" style={{ color: 'var(--text-primary, #111827)' }}>
+            <svg className="w-5 h-5 mr-2" style={{ color: 'var(--text-amber, #d97706)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
             </svg>
             上传者
@@ -194,29 +192,29 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
               </div>
             </div>
             <div className="flex-1">
-              <h4 className="font-bold text-xl text-gray-900">
+              <h4 className="font-bold text-xl" style={{ color: 'var(--text-primary, #111827)' }}>
                 {typeof resource.uploader === 'object' ? resource.uploader.username : '未知用户'}
               </h4>
-              <p className="text-amber-700 font-medium text-base">资源贡献者</p>
+              <p className="font-medium text-base" style={{ color: 'var(--text-amber, #d97706)' }}>资源贡献者</p>
               <div className="flex items-center mt-2">
-                <div className="rating-stars text-sm text-amber-500">★★★★★</div>
-                <span className="text-sm text-gray-500 ml-2 font-medium">4.9分</span>
+                <div className="rating-stars text-sm" style={{ color: 'var(--text-amber, #d97706)' }}>★★★★★</div>
+                <span className="text-sm ml-2 font-medium" style={{ color: 'var(--text-secondary, #6b7280)' }}>4.9分</span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-100 hover:shadow-md transition-shadow">
-              <div className="text-2xl font-bold text-amber-800 mb-1">1</div>
-              <div className="text-sm text-gray-600 font-medium">上传资源</div>
+            <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-100 dark:border-amber-800 hover:shadow-md transition-shadow">
+              <div className="text-2xl font-bold text-amber-800 dark:text-amber-300 mb-1">1</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">上传资源</div>
             </div>
-            <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-100 hover:shadow-md transition-shadow">
-              <div className="text-2xl font-bold text-amber-800 mb-1">{resource.downloadCount || 0}</div>
-              <div className="text-sm text-gray-600 font-medium">获得访问</div>
+            <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl border border-amber-100 dark:border-amber-800 hover:shadow-md transition-shadow">
+              <div className="text-2xl font-bold text-amber-800 dark:text-amber-300 mb-1">{resource.downloadCount || 0}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">获得访问</div>
             </div>
           </div>
 
-          <div className="mt-4 text-sm text-gray-500">
+          <div className="mt-4 text-sm text-gray-500 dark:text-gray-400">
             <p>上传时间: {formatDate(resource.createdAt)}</p>
             <p>最后更新: {formatDate(resource.updatedAt)}</p>
             <p>分类: {getCategoryName(resource.category)}</p>
@@ -320,20 +318,20 @@ export default function ResourceDetailPage() {
 
         {/* 评论区 */}
         <div className="mt-12">
-          <div className="card p-8 bg-gradient-to-br from-white to-amber-25 border-amber-100">
+          <div className="card p-8">
             {/* 评分组件 */}
             <div className="mb-10">
               <div className="flex items-center mb-6">
-                <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3" style={{ backgroundColor: 'var(--tag-bg, #fef3c7)' }}>
+                  <svg className="w-5 h-5" style={{ color: 'var(--text-amber, #d97706)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary, #111827)' }}>
                   资源评分
                 </h2>
               </div>
-              <div className="bg-white rounded-xl p-6 border border-amber-100 shadow-sm">
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-amber-100 dark:border-gray-700 shadow-sm">
                 <ResourceRating resourceId={resource._id} />
               </div>
             </div>

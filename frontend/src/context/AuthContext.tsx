@@ -17,6 +17,7 @@ interface AuthUser {
   email: string;
   role?: string;
   avatar?: string;
+  bio?: string;
   points?: number;
   status?: string;
   createdAt?: string;
@@ -70,6 +71,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         role: response.user.role,
         status: response.user.status,
         avatar: response.user.avatar,
+        bio: response.user.bio,
         points: response.user.points,
         createdAt: response.user.createdAt,
         updatedAt: response.user.updatedAt

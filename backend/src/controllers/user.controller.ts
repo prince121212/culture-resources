@@ -38,7 +38,7 @@ export const getUserProfile = async (req: Request, res: Response, next: NextFunc
 export const updateUserProfile = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
   try {
     const userId = req.params.id;
-    const { username, email } = req.body;
+    const { username, email, bio } = req.body;
     const currentUserId = req.user?.id;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -67,6 +67,7 @@ export const updateUserProfile = async (req: AuthenticatedRequest, res: Response
       {
         username,
         email,
+        bio,
         updatedAt: new Date()
       },
       { new: true }

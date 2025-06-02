@@ -150,9 +150,32 @@ export const getFavorites = async (req: AuthenticatedRequest, res: Response, nex
   }
 };
 
+/**
+ * @desc    清空用户所有收藏
+ * @route   DELETE /api/favorites
+ * @access  Private
+ */
+export const clearAllFavorites = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    // 删除用户的所有收藏
+    const result = await Favorite.deleteMany({ user: userId });
+
+    res.status(200).json({ 
+      message: '已清空所有收藏', 
+      deletedCount: result.deletedCount 
+    });
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   favoriteResource,
   unfavoriteResource,
   checkFavorite,
   getFavorites,
+  clearAllFavorites,
 };

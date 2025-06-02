@@ -7,9 +7,10 @@ import ResourceForm from '@/components/resources/ResourceForm';
 import {
   getResourceById,
   updateResource,
-  CreateResourceData, // Re-used for form structure, though it's an update
+  CreateResourceData,
   Resource as ResourceType,
   UpdateResourceResponse,
+  Category,
 } from '@/services/resource.service';
 import { ApiError, ValidationError } from '@/services/auth.service';
 import toast from 'react-hot-toast';
@@ -160,7 +161,8 @@ export default function EditResourcePage() {
     description: resource.description || '',
     // 使用resource.link作为url字段的值，因为CreateResourceData接受url字段
     url: resource.link,
-    category: resource.category || '',
+    // 确保使用分类ID
+    category: typeof resource.category === 'object' && resource.category ? resource.category._id : resource.category || '',
     // 修复类型错误：确保tags始终是数组
     tags: Array.isArray(resource.tags) ? resource.tags : [],
   };
@@ -168,11 +170,14 @@ export default function EditResourcePage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <div className="mb-6">
-        <Link href={resourceId ? `/resources/${resourceId}` : "/resources"} className="text-blue-400 hover:text-blue-300 font-medium flex items-center">
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        <Link 
+          href="/profile?section=uploads" 
+          className="inline-flex items-center px-4 py-2 bg-gray-700/70 backdrop-blur-sm rounded-full shadow-sm text-white hover:bg-gray-600/70 transition-all duration-200 font-medium"
+        >
+          <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M15 19L8 12L15 5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          返回资源详情
+          返回个人中心
         </Link>
         <h1 className="text-3xl font-bold text-white mt-3 mb-2">编辑资源</h1>
         <p className="text-gray-300 text-lg">更新您的资源详情。</p>

@@ -16,6 +16,7 @@ export interface User {
   email: string;
   role: string;
   avatar?: string;
+  bio?: string;
   points?: number;
   status?: string;
   createdAt?: string;

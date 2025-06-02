@@ -10,6 +10,7 @@ import { getResources, Resource, PaginatedResourcesResponse } from '@/services/r
 import { ApiError } from '@/services/auth.service';
 import { getUserStats, getUserFavorites } from '@/services/user.service';
 import { getUserRatings, ResourceRating } from '@/services/rating.service';
+import { clearAllFavorites } from '@/services/favorite.service';
 
 // 用户统计数据类型
 interface UserStats {
@@ -173,6 +174,46 @@ export default function ProfilePage() {
       setIsLoadingRatings(false);
     }
   }, [currentUser?._id, token]);
+
+  // 清空收藏功能
+  const handleClearFavorites = useCallback(async () => {
+    if (!token) {
+      toast.error('请先登录');
+      return;
+    }
+
+    if (favorites.length === 0) {
+      toast('您还没有收藏任何资源', { icon: 'ℹ️' });
+      return;
+    }
+
+    // 确认对话框
+    if (!window.confirm('确定要清空所有收藏吗？此操作不可撤销。')) {
+      return;
+    }
+
+    try {
+      const result = await clearAllFavorites(token);
+      toast.success(`已清空所有收藏，共删除 ${result.deletedCount} 个收藏`);
+
+      // 刷新收藏列表和统计数据
+      setFavorites([]);
+      if (stats) {
+        setStats({
+          ...stats,
+          favorites: { count: 0 }
+        });
+      }
+    } catch (err) {
+      let errorMessage = '清空收藏失败';
+      if (err instanceof ApiError) {
+        errorMessage = err.response?.message || err.message;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      toast.error(errorMessage);
+    }
+  }, [token, favorites.length, stats]);
 
   // 移除模拟数据，现在使用真实数据
 
@@ -463,7 +504,9 @@ export default function ProfilePage() {
                       style={{
                         border: '1px solid var(--border, #d4c4a8)',
                         backgroundColor: 'var(--bg-card, #faf8f3)',
-                        color: 'var(--text-primary, #2d2a24)'
+                        color: 'var(--text-primary, #2d2a24)',
+                        cursor: 'not-allowed',
+                        opacity: 0.8
                       }}
                       value={currentUser.username}
                       readOnly
@@ -477,7 +520,9 @@ export default function ProfilePage() {
                       style={{
                         border: '1px solid var(--border, #d4c4a8)',
                         backgroundColor: 'var(--bg-card, #faf8f3)',
-                        color: 'var(--text-primary, #2d2a24)'
+                        color: 'var(--text-primary, #2d2a24)',
+                        cursor: 'not-allowed',
+                        opacity: 0.8
                       }}
                       value={currentUser.email}
                       readOnly
@@ -491,9 +536,12 @@ export default function ProfilePage() {
                     style={{
                       border: '1px solid var(--border, #d4c4a8)',
                       backgroundColor: 'var(--bg-card, #faf8f3)',
-                      color: 'var(--text-primary, #2d2a24)'
+                      color: 'var(--text-primary, #2d2a24)',
+                      cursor: 'not-allowed',
+                      opacity: 0.8
                     }}
                     placeholder="介绍一下自己..."
+                    value={currentUser.bio || ''}
                     readOnly
                   />
                 </div>
@@ -612,7 +660,10 @@ export default function ProfilePage() {
                               color: '#fff',
                               background: '#d97706',
                             }}
-                            onClick={e => { e.stopPropagation(); /* 编辑逻辑 */ }}
+                            onClick={e => { 
+                              e.stopPropagation(); 
+                              router.push(`/resources/${resource._id}/edit`);
+                            }}
                           >编辑</button>
                         </div>
                       </div>
@@ -645,7 +696,10 @@ export default function ProfilePage() {
                     <option value="音乐舞蹈">音乐舞蹈</option>
                     <option value="历史文化">历史文化</option>
                   </select>
-                  <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <button
+                    onClick={handleClearFavorites}
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  >
                     清空收藏
                   </button>
                 </div>

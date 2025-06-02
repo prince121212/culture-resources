@@ -70,6 +70,10 @@ const userProfileUpdateValidationRules = () => [
     .optional()
     .isEmail()
     .withMessage('请提供有效的邮箱地址'),
+  body('bio')
+    .optional()
+    .isLength({ max: 500 })
+    .withMessage('个人简介不能超过500个字符'),
 ];
 
 

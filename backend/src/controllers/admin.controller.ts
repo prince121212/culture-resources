@@ -53,6 +53,31 @@ export const getPendingResources = async (req: AuthenticatedRequest, res: Respon
               name: resourceObj.category,
               description: null
             };
+          } else if (typeof resourceObj.category === 'object' && resourceObj.category !== null) {
+            // 如果已经是对象，检查是否有效
+            if (resourceObj.category.name && resourceObj.category.name !== '[object Object]') {
+              // 对象有效，保持不变
+            } else {
+              // 对象无效，尝试从_id重新获取
+              if (resourceObj.category._id && mongoose.Types.ObjectId.isValid(resourceObj.category._id)) {
+                try {
+                  const categoryDoc = await Category.findById(resourceObj.category._id);
+                  if (categoryDoc) {
+                    resourceObj.category = {
+                      _id: (categoryDoc._id as any).toString(),
+                      name: categoryDoc.name,
+                      description: categoryDoc.description
+                    };
+                  }
+                } catch (error) {
+                  // 如果获取分类失败，设置为未分类
+                  resourceObj.category = null;
+                }
+              } else {
+                // 无法修复，设置为未分类
+                resourceObj.category = null;
+              }
+            }
           }
         }
 
@@ -483,6 +508,31 @@ export const getUserResources = async (req: AuthenticatedRequest, res: Response,
               name: resourceObj.category,
               description: null
             };
+          } else if (typeof resourceObj.category === 'object' && resourceObj.category !== null) {
+            // 如果已经是对象，检查是否有效
+            if (resourceObj.category.name && resourceObj.category.name !== '[object Object]') {
+              // 对象有效，保持不变
+            } else {
+              // 对象无效，尝试从_id重新获取
+              if (resourceObj.category._id && mongoose.Types.ObjectId.isValid(resourceObj.category._id)) {
+                try {
+                  const categoryDoc = await Category.findById(resourceObj.category._id);
+                  if (categoryDoc) {
+                    resourceObj.category = {
+                      _id: (categoryDoc._id as any).toString(),
+                      name: categoryDoc.name,
+                      description: categoryDoc.description
+                    };
+                  }
+                } catch (error) {
+                  // 如果获取分类失败，设置为未分类
+                  resourceObj.category = null;
+                }
+              } else {
+                // 无法修复，设置为未分类
+                resourceObj.category = null;
+              }
+            }
           }
         }
 
