@@ -69,10 +69,9 @@ export default function EditProfilePage() {
     setGeneralError(null);
 
     try {
-      // 准备更新数据
+      // 准备更新数据（排除邮箱字段）
       const updateData: UpdateUserProfileData = {
         username,
-        email,
         bio,
       };
 
@@ -164,7 +163,7 @@ export default function EditProfilePage() {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-white">编辑个人资料</h1>
+          <h1 className="text-3xl font-bold text-gray-800 dark:text-white" style={{ color: 'var(--text-primary, #2d2a24)' }}>编辑个人资料</h1>
           <Link
             href="/profile"
             className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
@@ -258,10 +257,11 @@ export default function EditProfilePage() {
               onChange={(e) => setEmail(e.target.value)}
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:text-gray-300 dark:bg-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                 getFieldError('email') ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
-              }`}
-              disabled={isSubmitting}
+              } opacity-50 cursor-not-allowed`}
+              disabled={true}
               required
             />
+            <p className="text-gray-500 text-xs mt-1">邮箱地址暂时无法修改</p>
             {getFieldError('email') && (
               <p className="text-red-500 text-xs italic mt-1">{getFieldError('email')}</p>
             )}

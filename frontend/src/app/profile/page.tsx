@@ -546,7 +546,7 @@ export default function ProfilePage() {
                       opacity: 0.8
                     }}
                     placeholder="介绍一下自己..."
-                    value={currentUser.bio || ''}
+                    value={currentUser?.bio || ''}
                     readOnly
                   />
                 </div>
@@ -975,12 +975,11 @@ export default function ProfilePage() {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1" style={{paddingTop: 0, paddingBottom: 0, marginBottom: 0}}>
                           <h3 className="font-semibold text-lg mb-2 text-gray-800 dark:text-white">{rating.resource.title}</h3>
-                          <div className="flex items-center space-x-3 mb-2" style={{margin: 0}}>
+                          <div className="flex items-center mb-2" style={{margin: 0}}>
                             <div className="text-yellow-400">
                               {getRatingStars(rating.rating)}
                             </div>
-                            <span className="text-sm text-gray-500">您的评分：{rating.rating}星</span>
-                            <span className="text-sm text-gray-500">{formatDate(rating.createdAt)}</span>
+                            <span className="text-sm text-gray-500 ml-auto">{formatDate(rating.createdAt)}</span>
                           </div>
                           {rating.comment && (
                             <p className="text-sm text-gray-600 dark:text-gray-400">

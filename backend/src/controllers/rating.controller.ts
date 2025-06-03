@@ -178,6 +178,9 @@ export const getUserRatings = async (req: AuthenticatedRequest, res: Response, n
     const sortOrder = req.query.sortOrder as string || 'desc';
     const sortOptions: Record<string, 1 | -1> = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
+    // 筛选参数
+    const ratingFilter = req.query.rating ? parseInt(req.query.rating as string) : null;
+
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ message: '无效的用户ID' });
     }
@@ -187,11 +190,19 @@ export const getUserRatings = async (req: AuthenticatedRequest, res: Response, n
       return res.status(403).json({ message: '没有权限查看其他用户的评分历史' });
     }
 
+    // 构建查询条件
+    const query: any = { user: userId };
+    
+    // 添加评分过滤条件
+    if (ratingFilter !== null) {
+      query.rating = ratingFilter;
+    }
+
     // 获取总评分数
-    const totalRatings = await Rating.countDocuments({ user: userId });
+    const totalRatings = await Rating.countDocuments(query);
 
     // 获取评分历史，并关联资源信息
-    const ratings = await Rating.find({ user: userId })
+    const ratings = await Rating.find(query)
       .populate('resource', 'title description category link')
       .sort(sortOptions)
       .skip(skip)
