@@ -109,7 +109,7 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
 
           {/* 资源描述 */}
           {resource.description && (
-            <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-xl border border-amber-100 dark:border-gray-700">
+            <div className="mb-8 p-6 rounded-xl border border-amber-100 dark:border-gray-700 bg-amber-50/50 dark:bg-gray-700">
               <div className="flex items-center mb-4">
                 <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center mr-3">
                   <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
