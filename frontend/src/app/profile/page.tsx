@@ -5,6 +5,7 @@ import Image from 'next/image';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useFavorites } from '@/context/FavoriteContext';
 import toast from 'react-hot-toast';
 import { getResources, Resource, PaginatedResourcesResponse } from '@/services/resource.service';
 import { ApiError } from '@/services/auth.service';
@@ -51,6 +52,7 @@ interface Rating {
 export default function ProfilePage() {
   const router = useRouter();
   const { user: currentUser, isAuthenticated, isLoading: authLoading, token } = useAuth();
+  const { refreshFavorites } = useFavorites();
 
   // 统计数据状态
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -204,6 +206,9 @@ export default function ProfilePage() {
           favorites: { count: 0 }
         });
       }
+
+      // 刷新全局收藏状态
+      await refreshFavorites();
     } catch (err) {
       let errorMessage = '清空收藏失败';
       if (err instanceof ApiError) {
@@ -213,7 +218,7 @@ export default function ProfilePage() {
       }
       toast.error(errorMessage);
     }
-  }, [token, favorites.length, stats]);
+  }, [token, favorites.length, stats, refreshFavorites]);
 
   // 移除模拟数据，现在使用真实数据
 
