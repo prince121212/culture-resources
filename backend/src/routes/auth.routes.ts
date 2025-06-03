@@ -20,7 +20,6 @@ router.post('/register', [
   }
 
   const { username, email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
 
   // 获取默认头像ID
   const defaultAvatarId = await getDefaultAvatarId();
@@ -28,7 +27,7 @@ router.post('/register', [
   const user = new User({
     username,
     email,
-    password: hashedPassword,
+    password,
     role: 'user',
     avatar: defaultAvatarId, // 设置默认头像
     createdAt: new Date(),
@@ -75,11 +74,12 @@ router.post('/login', [
     const isMatch = await user.matchPassword(password);
     console.log('Password comparison details:', {
       providedPassword: password,
-      storedPasswordHash: user.password,
+      storedPasswordHash: user.password ? user.password.substring(0, 20) + '...' : 'no password',
       isMatch: isMatch
     });
 
     if (!isMatch) {
+      console.log('Password mismatch for user:', email);
       res.status(401).json({ message: '密码错误' });
       return;
     }
