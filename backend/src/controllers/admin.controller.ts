@@ -55,13 +55,14 @@ export const getPendingResources = async (req: AuthenticatedRequest, res: Respon
             };
           } else if (typeof resourceObj.category === 'object' && resourceObj.category !== null) {
             // 如果已经是对象，检查是否有效
-            if (resourceObj.category.name && resourceObj.category.name !== '[object Object]') {
+            const categoryObj = resourceObj.category as any;
+            if (categoryObj.name && categoryObj.name !== '[object Object]') {
               // 对象有效，保持不变
             } else {
               // 对象无效，尝试从_id重新获取
-              if (resourceObj.category._id && mongoose.Types.ObjectId.isValid(resourceObj.category._id)) {
+              if (categoryObj._id && mongoose.Types.ObjectId.isValid(categoryObj._id)) {
                 try {
-                  const categoryDoc = await Category.findById(resourceObj.category._id);
+                  const categoryDoc = await Category.findById(categoryObj._id);
                   if (categoryDoc) {
                     resourceObj.category = {
                       _id: (categoryDoc._id as any).toString(),
@@ -510,13 +511,14 @@ export const getUserResources = async (req: AuthenticatedRequest, res: Response,
             };
           } else if (typeof resourceObj.category === 'object' && resourceObj.category !== null) {
             // 如果已经是对象，检查是否有效
-            if (resourceObj.category.name && resourceObj.category.name !== '[object Object]') {
+            const categoryObj = resourceObj.category as any;
+            if (categoryObj.name && categoryObj.name !== '[object Object]') {
               // 对象有效，保持不变
             } else {
               // 对象无效，尝试从_id重新获取
-              if (resourceObj.category._id && mongoose.Types.ObjectId.isValid(resourceObj.category._id)) {
+              if (categoryObj._id && mongoose.Types.ObjectId.isValid(categoryObj._id)) {
                 try {
-                  const categoryDoc = await Category.findById(resourceObj.category._id);
+                  const categoryDoc = await Category.findById(categoryObj._id);
                   if (categoryDoc) {
                     resourceObj.category = {
                       _id: (categoryDoc._id as any).toString(),

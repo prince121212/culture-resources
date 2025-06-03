@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
-import { toggleFavorite, checkFavorite } from '@/services/favorite.service';
+import { toggleFavorite } from '@/services/favorite.service';
 import { useAuth } from '@/context/AuthContext';
+import { useFavorites } from '@/context/FavoriteContext';
 import toast from 'react-hot-toast';
 
 interface FavoriteButtonProps {
@@ -21,26 +22,11 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   className = '',
 }) => {
   const { token, isAuthenticated } = useAuth();
-  const [isFavorite, setIsFavorite] = useState(initialIsFavorite);
+  const { isFavorite: isGloballyFavorite, addFavorite, removeFavorite } = useFavorites();
   const [isLoading, setIsLoading] = useState(false);
 
-  // 检查初始收藏状态
-  useEffect(() => {
-    const checkInitialFavoriteStatus = async () => {
-      if (!isAuthenticated || !token) return;
-
-      try {
-        const { isFavorite } = await checkFavorite(resourceId, token);
-        setIsFavorite(isFavorite);
-      } catch (error) {
-        console.error('检查收藏状态失败', error);
-      }
-    };
-
-    if (resourceId) {
-      checkInitialFavoriteStatus();
-    }
-  }, [resourceId, token, isAuthenticated]);
+  // 使用全局收藏状态，如果全局状态还在加载中则使用初始值
+  const isFavorite = isGloballyFavorite(resourceId);
 
   // 处理收藏/取消收藏
   const handleToggleFavorite = async (e: React.MouseEvent) => {
@@ -60,9 +46,17 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     if (isLoading) return;
 
     setIsLoading(true);
+
+    // 乐观更新：立即更新UI状态
+    const newFavoriteState = !isFavorite;
+    if (newFavoriteState) {
+      addFavorite(resourceId);
+    } else {
+      removeFavorite(resourceId);
+    }
+
     try {
       const result = await toggleFavorite(resourceId, isFavorite, token);
-      setIsFavorite(result.isFavorite);
       toast.success(result.message);
 
       // 通知父组件状态变化
@@ -70,6 +64,13 @@ const FavoriteButton: React.FC<FavoriteButtonProps> = ({
         onToggle(result.isFavorite);
       }
     } catch (error) {
+      // 如果请求失败，回滚状态
+      if (newFavoriteState) {
+        removeFavorite(resourceId);
+      } else {
+        addFavorite(resourceId);
+      }
+
       console.error('切换收藏状态失败', error);
       if (error instanceof Error) {
         toast.error(`操作失败: ${error.message}`);

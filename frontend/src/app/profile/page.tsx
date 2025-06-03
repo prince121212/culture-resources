@@ -571,7 +571,36 @@ export default function ProfilePage() {
                   <select
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                     value={uploadStatusFilter}
-                    onChange={(e) => setUploadStatusFilter(e.target.value)}
+                    onChange={(e) => {
+                      const newStatus = e.target.value;
+                      setUploadStatusFilter(newStatus);
+                      // 调用API获取筛选后的资源
+                      setIsLoadingUploads(true);
+                      getResources({
+                        uploaderId: currentUser._id,
+                        status: newStatus,
+                        sortBy: 'createdAt',
+                        sortOrder: 'desc',
+                        limit: 50,
+                      })
+                        .then((response) => {
+                          setUserResources(response.data);
+                        })
+                        .catch((err) => {
+                          let errorMessage = '获取您的资源失败';
+                          if (err instanceof ApiError) {
+                            errorMessage = err.response?.message || err.message;
+                          } else if (err instanceof Error) {
+                            errorMessage = err.message;
+                          }
+                          setUploadsError(errorMessage);
+                          toast.error(errorMessage);
+                          setUserResources([]);
+                        })
+                        .finally(() => {
+                          setIsLoadingUploads(false);
+                        });
+                    }}
                   >
                     <option value="all">全部状态</option>
                     <option value="approved">已审核</option>
@@ -639,6 +668,19 @@ export default function ProfilePage() {
                           {getStatusBadge((resource as { status?: string }).status || 'pending')}
                         </div>
                       </div>
+                      {/* 显示拒绝原因 */}
+                      {(resource as { status?: string }).status === 'rejected' && (resource as { rejectReason?: string }).rejectReason && (
+                        <div className="text-xs text-red-600 mb-2 break-words w-full" style={{ 
+                          wordBreak: 'break-word', 
+                          overflow: 'visible', 
+                          maxWidth: '100%',
+                          whiteSpace: 'normal',
+                          lineHeight: 1.4,
+                          padding: '0 2px'
+                        }}>
+                          拒绝原因: {(resource as { rejectReason?: string }).rejectReason}
+                        </div>
+                      )}
                       <div className="flex items-center justify-between gap-1" style={{ fontSize: 11, lineHeight: 1.3, minHeight: 20 }}>
                         <div className="text-[11px] text-gray-500" style={{ lineHeight: 1.3 }}>
                           上传时间：{formatDate(resource.createdAt)}
@@ -688,7 +730,54 @@ export default function ProfilePage() {
                   <select
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                     value={favoriteCategoryFilter}
-                    onChange={(e) => setFavoriteCategoryFilter(e.target.value)}
+                    onChange={(e) => {
+                      const newCategoryFilter = e.target.value;
+                      setFavoriteCategoryFilter(newCategoryFilter);
+                      // 调用API获取筛选后的收藏
+                      setIsLoadingFavorites(true);
+                      
+                      // 确保userId和token不为null
+                      if (!currentUser?._id || !token) {
+                        setIsLoadingFavorites(false);
+                        setFavoritesError('用户未登录或会话已过期');
+                        toast.error('用户未登录或会话已过期');
+                        return;
+                      }
+                      
+                      // 注意：getUserFavorites目前不支持分类筛选，仅在前端过滤
+                      getUserFavorites(currentUser._id, token)
+                        .then((favoritesData) => {
+                          // 如果选择了特定分类，在前端过滤结果
+                          if (newCategoryFilter !== 'all') {
+                            const filtered = favoritesData.filter(resource => {
+                              // 检查category是否为字符串或对象
+                              if (typeof resource.category === 'string') {
+                                return resource.category === newCategoryFilter;
+                              } else if (resource.category && typeof resource.category === 'object') {
+                                return resource.category.name === newCategoryFilter;
+                              }
+                              return false;
+                            });
+                            setFavorites(filtered);
+                          } else {
+                            setFavorites(favoritesData);
+                          }
+                        })
+                        .catch((err) => {
+                          let errorMessage = '获取收藏失败';
+                          if (err instanceof ApiError) {
+                            errorMessage = err.response?.message || err.message;
+                          } else if (err instanceof Error) {
+                            errorMessage = err.message;
+                          }
+                          setFavoritesError(errorMessage);
+                          toast.error(errorMessage);
+                          setFavorites([]);
+                        })
+                        .finally(() => {
+                          setIsLoadingFavorites(false);
+                        });
+                    }}
                   >
                     <option value="all">全部分类</option>
                     <option value="文学作品">文学作品</option>
@@ -775,7 +864,63 @@ export default function ProfilePage() {
                   <select
                     className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
                     value={ratingFilter}
-                    onChange={(e) => setRatingFilter(e.target.value)}
+                    onChange={(e) => {
+                      const newRatingFilter = e.target.value;
+                      setRatingFilter(newRatingFilter);
+                      // 调用API获取筛选后的评分历史
+                      setIsLoadingRatings(true);
+                      
+                      // 确保userId和token不为null
+                      if (!currentUser?._id || !token) {
+                        setIsLoadingRatings(false);
+                        setRatingsError('用户未登录或会话已过期');
+                        toast.error('用户未登录或会话已过期');
+                        return;
+                      }
+                      
+                      const params: { limit: number; rating?: number } = { limit: 50 };
+                      if (newRatingFilter !== 'all') {
+                        params.rating = parseInt(newRatingFilter);
+                      }
+                      
+                      getUserRatings(currentUser._id, token, params)
+                        .then((ratingsResponse) => {
+                          // 转换数据格式以匹配现有的Rating接口
+                          const formattedRatings: Rating[] = ratingsResponse.data.map((rating: ResourceRating) => ({
+                            _id: rating._id,
+                            resource: typeof rating.resource === 'string' ? {
+                              _id: rating.resource,
+                              title: '未知资源',
+                              description: '',
+                              link: '',
+                              category: '',
+                              tags: [],
+                              uploader: { _id: '', username: '' },
+                              createdAt: rating.createdAt,
+                              updatedAt: rating.updatedAt,
+                              downloadCount: 0
+                            } : rating.resource as Resource,
+                            rating: rating.rating,
+                            comment: '', // ResourceRating 没有 comment 字段，使用空字符串
+                            createdAt: rating.createdAt
+                          }));
+                          setRatings(formattedRatings);
+                        })
+                        .catch((err) => {
+                          let errorMessage = '获取评分历史失败';
+                          if (err instanceof ApiError) {
+                            errorMessage = err.response?.message || err.message;
+                          } else if (err instanceof Error) {
+                            errorMessage = err.message;
+                          }
+                          setRatingsError(errorMessage);
+                          toast.error(errorMessage);
+                          setRatings([]);
+                        })
+                        .finally(() => {
+                          setIsLoadingRatings(false);
+                        });
+                    }}
                   >
                     <option value="all">全部评分</option>
                     <option value="5">5星</option>

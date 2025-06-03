@@ -8,9 +8,11 @@ import { getResources, Resource } from '@/services/resource.service';
 import { getCategories, Category } from '@/services/category.service';
 import { getTags } from '@/services/tag.service';
 import FavoriteButton from '@/components/resources/FavoriteButton';
+import { useFavorites } from '@/context/FavoriteContext';
 
 export default function Home() {
   const router = useRouter();
+  const { isFavorite } = useFavorites();
   const [searchQuery, setSearchQuery] = useState('');
   const [stats, setStats] = useState({
     resourceCount: 0,
@@ -213,7 +215,7 @@ export default function Home() {
                       <h3 className="font-semibold">{resource.title}</h3>
                       <FavoriteButton
                         resourceId={resource._id}
-                        initialIsFavorite={resource.isFavorite}
+                        initialIsFavorite={isFavorite(resource._id)}
                         className="p-1"
                       />
                     </div>
@@ -285,7 +287,7 @@ export default function Home() {
                         <h3 className="font-semibold">{resource.title}</h3>
                         <FavoriteButton
                           resourceId={resource._id}
-                          initialIsFavorite={resource.isFavorite}
+                          initialIsFavorite={isFavorite(resource._id)}
                           className="p-1"
                         />
                       </div>

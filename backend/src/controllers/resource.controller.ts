@@ -256,14 +256,15 @@ export const getResourceById = async (req: Request, res: Response, next: NextFun
         };
       } else if (typeof resource.category === 'object' && resource.category !== null) {
         // 如果已经是对象，检查是否有效
-        if (resource.category.name && resource.category.name !== '[object Object]') {
+        const categoryObj = resource.category as any;
+        if (categoryObj.name && categoryObj.name !== '[object Object]') {
           // 对象有效，保持不变
-          populatedResource.category = resource.category;
+          populatedResource.category = categoryObj;
         } else {
           // 对象无效，尝试从_id重新获取
-          if (resource.category._id && mongoose.Types.ObjectId.isValid(resource.category._id)) {
+          if (categoryObj._id && mongoose.Types.ObjectId.isValid(categoryObj._id)) {
             try {
-              const categoryDoc = await Category.findById(resource.category._id);
+              const categoryDoc = await Category.findById(categoryObj._id);
               if (categoryDoc) {
                 populatedResource.category = {
                   _id: (categoryDoc._id as any).toString(),

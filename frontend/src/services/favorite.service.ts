@@ -38,6 +38,33 @@ export const getFavoriteResources = async (
 };
 
 /**
+ * 获取用户收藏的所有资源ID列表（用于批量检查收藏状态）
+ */
+export const getFavoriteResourceIds = async (
+  token: string
+): Promise<string[]> => {
+  const response = await fetch(`${API_BASE_URL}/favorites/ids`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new ApiError(
+      response.status,
+      '获取收藏ID列表失败',
+      { message: data.message || '获取收藏ID列表失败' }
+    );
+  }
+
+  return data.favoriteIds as string[];
+};
+
+/**
  * 收藏资源
  */
 export const favoriteResource = async (

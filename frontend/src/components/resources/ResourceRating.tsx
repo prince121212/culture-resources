@@ -116,8 +116,8 @@ const ResourceRating: React.FC<ResourceRatingProps> = ({ resourceId, onRatingCha
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* 左侧评分概览 */}
           <div>
-            <div className="flex items-center mb-6">
-              <div className="mr-4">
+            <div className="flex flex-col sm:flex-row sm:items-center mb-6 space-y-4 sm:space-y-0">
+              <div className="sm:mr-4">
                 <div className="text-5xl font-bold text-amber-600">
                   {ratingStats.averageRating.toFixed(1)}
                 </div>
@@ -126,10 +126,10 @@ const ResourceRating: React.FC<ResourceRatingProps> = ({ resourceId, onRatingCha
                 </div>
               </div>
               <div className="flex flex-col space-y-1">
-                <RatingStars 
-                  initialRating={ratingStats.averageRating} 
-                  readOnly 
-                  size="md" 
+                <RatingStars
+                  initialRating={ratingStats.averageRating}
+                  readOnly
+                  size="md"
                 />
               </div>
             </div>
@@ -139,16 +139,16 @@ const ResourceRating: React.FC<ResourceRatingProps> = ({ resourceId, onRatingCha
               <h4 className="text-lg font-medium text-gray-800 mb-3">
                 {userRating > 0 ? '您的评分' : '为此资源评分'}
               </h4>
-              <div className="flex items-center">
-                <RatingStars 
-                  initialRating={userRating} 
-                  onRatingChange={handleRatingChange} 
-                  size="lg" 
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0">
+                <RatingStars
+                  initialRating={userRating}
+                  onRatingChange={handleRatingChange}
+                  size="lg"
                   showRatingText
                   readOnly={isSubmitting}
                 />
                 {isSubmitting && (
-                  <div className="ml-3 flex items-center">
+                  <div className="sm:ml-3 flex items-center">
                     <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mr-2"></div>
                     <span className="text-sm text-amber-600">提交中...</span>
                   </div>

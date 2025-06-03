@@ -71,12 +71,12 @@ const RatingStars: React.FC<RatingStarsProps> = ({
   };
 
   return (
-    <div className="flex items-center">
+    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0">
       <div className="flex">
         {[...Array(maxRating)].map((_, index) => {
           const starValue = index + 1;
           const isFilled = starValue <= (hoverRating || rating);
-          
+
           return (
             <button
               key={index}
@@ -97,9 +97,9 @@ const RatingStars: React.FC<RatingStarsProps> = ({
           );
         })}
       </div>
-      
+
       {showRatingText && (
-        <span className="ml-3 text-sm font-medium text-amber-600">
+        <span className="sm:ml-3 text-sm font-medium text-amber-600">
           {getRatingText()}
         </span>
       )}

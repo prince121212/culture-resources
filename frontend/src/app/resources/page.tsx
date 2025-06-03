@@ -16,6 +16,7 @@ import { getCategories, Category } from '@/services/category.service';
 import { getTags, Tag } from '@/services/tag.service';
 import ResourceCard from '@/components/resources/ResourceCard';
 import FavoriteButton from '@/components/resources/FavoriteButton';
+import { useFavorites } from '@/context/FavoriteContext';
 
 export default function ResourcesPage() {
   const router = useRouter();
@@ -139,9 +140,6 @@ export default function ResourcesPage() {
     } else if (value === 'popular') {
       setSortBy('downloadCount');
       setSortOrder('desc');
-    } else if (value === 'downloads') {
-      setSortBy('downloadCount');
-      setSortOrder('desc');
     } else if (value === 'rating') {
       setSortBy('rating');
       setSortOrder('desc');
@@ -182,8 +180,8 @@ export default function ResourcesPage() {
         <div className="card p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             {/* 搜索框 */}
-            <div className="relative flex-1">
-              <form onSubmit={handleSearch}>
+            <div className="relative w-full md:flex-1">
+              <form onSubmit={handleSearch} className="w-full">
                 <input
                   type="text"
                   placeholder="搜索资源..."
@@ -195,9 +193,9 @@ export default function ResourcesPage() {
             </div>
 
             {/* 分类筛选 */}
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <select 
-                className="input-field pr-10"
+                className="input-field pr-10 w-full"
                 value={selectedCategory}
                 onChange={(e) => {
                   setSelectedCategory(e.target.value);
@@ -214,19 +212,18 @@ export default function ResourcesPage() {
             </div>
 
             {/* 排序 */}
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <select
                 value={sortBy === 'createdAt' && sortOrder === 'desc' ? 'newest' :
                        sortBy === 'createdAt' && sortOrder === 'asc' ? 'oldest' :
                        sortBy === 'downloadCount' ? 'popular' :
                        sortBy === 'rating' ? 'rating' : 'newest'}
                 onChange={(e) => handleSortChange(e.target.value)}
-                className="input-field pr-10"
+                className="input-field pr-10 w-full"
               >
                 <option value="newest">最新上传</option>
                 <option value="oldest">最早上传</option>
                 <option value="popular">最多下载</option>
-                <option value="downloads">最多下载</option>
                 <option value="rating">评分最高</option>
               </select>
             </div>
@@ -234,7 +231,7 @@ export default function ResourcesPage() {
             <button 
               type="submit" 
               onClick={handleSearch}
-              className="btn-primary"
+              className="btn-primary w-full md:w-auto"
             >
               搜索
             </button>

@@ -29,6 +29,8 @@ export interface Resource {
   updatedAt: string; // Date as string
   isFavorite?: boolean; // 是否已收藏
   downloadDate?: string; // 下载日期（仅在下载历史中使用）
+  status?: string; // 资源状态：pending, approved, rejected
+  rejectReason?: string; // 拒绝原因
 }
 
 export interface PaginationInfo {

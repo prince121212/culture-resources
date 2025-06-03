@@ -269,6 +269,39 @@ h3 { font-size: 1.25rem; }
   h1 { font-size: 1.5rem; }
   h2 { font-size: 1.125rem; }
   h3 { font-size: 1rem; }
+  
+  /* 移动端筛选区域样式 */
+  .input-field {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+  
+  .card.p-6 {
+    padding: 1rem;
+  }
+  
+  .btn-primary {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+  
+  /* 移动端下拉框优化 */
+  select.input-field {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-right: 30px;
+  }
+  
+  /* 筛选表单中的间距 */
+  .flex.flex-col.gap-4 > * {
+    margin-bottom: 0.5rem;
+  }
 }
 
 @media (min-width: 769px) {

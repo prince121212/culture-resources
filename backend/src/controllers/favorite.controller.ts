@@ -151,6 +151,27 @@ export const getFavorites = async (req: AuthenticatedRequest, res: Response, nex
 };
 
 /**
+ * @desc    获取用户收藏的资源ID列表
+ * @route   GET /api/favorites/ids
+ * @access  Private
+ */
+export const getFavoriteIds = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+
+    const favorites = await Favorite.find({ user: userId }).select('resource');
+    const favoriteIds = favorites.map(favorite => favorite.resource.toString());
+
+    res.status(200).json({
+      favoriteIds: favoriteIds
+    });
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * @desc    清空用户所有收藏
  * @route   DELETE /api/favorites
  * @access  Private
@@ -177,5 +198,6 @@ export default {
   unfavoriteResource,
   checkFavorite,
   getFavorites,
+  getFavoriteIds,
   clearAllFavorites,
 };

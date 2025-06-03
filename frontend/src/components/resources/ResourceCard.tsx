@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Resource, deleteResource } from '@/services/resource.service';
 import { ApiError } from '@/services/auth.service';
 import FavoriteButton from './FavoriteButton';
+import { useFavorites } from '@/context/FavoriteContext';
 import toast from 'react-hot-toast';
 
 interface ResourceCardProps {
@@ -24,9 +25,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
   isFavorite = false,
   onFavoriteToggle,
 }) => {
+  const { isFavorite: isGloballyFavorite } = useFavorites();
   const isUploader = typeof resource.uploader === 'object'
     ? resource.uploader._id === currentUserId
     : resource.uploader === currentUserId;
+
+  // 使用全局收藏状态
+  const actualIsFavorite = isGloballyFavorite(resource._id);
 
   // 辅助函数：获取分类名称
   const getCategoryName = (category: {name?: string} | string | null): string => {
@@ -80,7 +85,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({
         {showFavoriteButton && (
           <FavoriteButton
             resourceId={resource._id}
-            initialIsFavorite={isFavorite || resource.isFavorite}
+            initialIsFavorite={actualIsFavorite}
             onToggle={onFavoriteToggle}
             className="p-1"
           />

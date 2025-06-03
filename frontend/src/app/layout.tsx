@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { FavoriteProvider } from "@/context/FavoriteContext";
 import Navbar from "@/components/Navbar";
 import { Toaster } from 'react-hot-toast';
 import Head from 'next/head';
@@ -58,19 +59,21 @@ export default function RootLayout({
           <StagewiseToolbar config={stagewiseConfig} />
         )}
         <AuthProvider>
-          <Toaster
-            position="top-center"
-            reverseOrder={false}
-            toastOptions={{
-              className: 'bg-card text-card-foreground border border-border',
-            }}
-          />
-          <div className="min-h-screen bg-newspaper">
-            <Navbar />
-            <main>
-              {children}
-            </main>
-          </div>
+          <FavoriteProvider>
+            <Toaster
+              position="top-center"
+              reverseOrder={false}
+              toastOptions={{
+                className: 'bg-card text-card-foreground border border-border',
+              }}
+            />
+            <div className="min-h-screen bg-newspaper">
+              <Navbar />
+              <main>
+                {children}
+              </main>
+            </div>
+          </FavoriteProvider>
         </AuthProvider>
       </body>
     </html>

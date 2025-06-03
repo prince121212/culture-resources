@@ -24,6 +24,26 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
   //   ? resource.uploader._id === currentUserId
   //   : resource.uploader === currentUserId;
 
+  // 检测深色模式
+  const [isDarkMode, setIsDarkMode] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDarkMode(document.documentElement.classList.contains('dark'));
+    };
+
+    checkDarkMode();
+
+    // 监听主题变化
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   // Helper to format date (can be moved to a utils file)
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('zh-CN', {
@@ -80,15 +100,12 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
             <div className="flex items-start justify-between mb-6">
               <div className="flex-1">
                 <h1 className="text-4xl font-bold mb-4 leading-tight" style={{ color: 'var(--text-primary, #111827)' }}>{resource.title}</h1>
-                <div className="flex items-center space-x-6 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-6 space-y-3 sm:space-y-0 mb-4">
                   <div className="flex items-center space-x-3">
                     <div className="rating-stars text-2xl" style={{ color: 'var(--text-amber, #d97706)' }}>★★★★★</div>
-                    <div className="flex flex-col">
-                      <span className="text-xl font-bold" style={{ color: 'var(--text-primary, #111827)' }}>{resource.rating ? resource.rating.toFixed(1) : '0'}</span>
-                      <span className="text-sm" style={{ color: 'var(--text-secondary, #6b7280)' }}>{resource.ratingCount || 0} 评价</span>
-                    </div>
+                    <span className="text-xl font-bold" style={{ color: 'var(--text-primary, #111827)' }}>{resource.rating ? resource.rating.toFixed(1) : '0'}</span>
                   </div>
-                  <div className="h-8 w-px" style={{ backgroundColor: 'var(--border-color, #e5e7eb)' }}></div>
+                  <div className="hidden sm:block h-8 w-px" style={{ backgroundColor: 'var(--border-color, #e5e7eb)' }}></div>
                   <div className="flex items-center space-x-2" style={{ color: 'var(--text-secondary, #6b7280)' }}>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -109,7 +126,7 @@ const ResourceDetailView: React.FC<ResourceDetailViewProps> = ({ resource, curre
 
           {/* 资源描述 */}
           {resource.description && (
-            <div className="mb-8 p-6 rounded-xl border border-amber-100 dark:border-gray-700 bg-amber-50/50 dark:bg-gray-700">
+            <div className="mb-8 p-6 rounded-xl border border-amber-100 dark:border-gray-700" style={{ backgroundColor: isDarkMode ? '#374151' : '#fef3c7' }}>
               <div className="flex items-center mb-4">
                 <div className="w-8 h-8 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center mr-3">
                   <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

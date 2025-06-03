@@ -5,6 +5,7 @@ import { getResources, PaginatedResourcesResponse, GetResourcesParams } from '@/
 import ResourceCard from './ResourceCard';
 import { ApiError } from '@/services/auth.service'; // For error handling
 import { useAuth } from '@/context/AuthContext'; // Import useAuth
+import { useFavorites } from '@/context/FavoriteContext';
 import PaginationControls from './PaginationControls'; // Import the new component
 import debounce from '@/utils/debounce'; // Import debounce utility
 
@@ -50,6 +51,7 @@ const ResourceList: React.FC<ResourceListProps> = ({ initialParams = {} }) => {
   const [refreshKey, setRefreshKey] = useState(0);
   
   const { user: currentUser, token, isLoading: authLoading } = useAuth();
+  const { isFavorite } = useFavorites();
 
   // Debounced function to update filters
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -246,6 +248,7 @@ const ResourceList: React.FC<ResourceListProps> = ({ initialParams = {} }) => {
               token={token}
               onResourceDeleted={handleResourceDeleted}
               showFavoriteButton={true}
+              isFavorite={isFavorite(resource._id)}
             />
           ))}
         </div>
