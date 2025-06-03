@@ -114,8 +114,20 @@ export default function AdminReviews() {
 
   const handleReject = async () => {
     if (!reviewingResource) return;
-    if (!rejectReason.trim()) {
+
+    const trimmedReason = rejectReason.trim();
+    if (!trimmedReason) {
       toast.error('请填写拒绝原因');
+      return;
+    }
+
+    if (trimmedReason.length < 5) {
+      toast.error('拒绝原因至少需要5个字符');
+      return;
+    }
+
+    if (trimmedReason.length > 500) {
+      toast.error('拒绝原因不能超过500个字符');
       return;
     }
 
@@ -128,12 +140,23 @@ export default function AdminReviews() {
         },
         body: JSON.stringify({
           status: 'rejected',
-          rejectReason: rejectReason,
+          rejectReason: trimmedReason,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('拒绝资源失败');
+        const errorData = await response.json();
+
+        // 处理验证错误
+        if (response.status === 400 && errorData.errors) {
+          const rejectReasonError = errorData.errors.find((err: any) => err.path === 'rejectReason');
+          if (rejectReasonError) {
+            toast.error(rejectReasonError.msg);
+            return;
+          }
+        }
+
+        throw new Error(errorData.message || '拒绝资源失败');
       }
 
       toast.success(`资源"${reviewingResource.title}"已被拒绝`);
@@ -141,7 +164,11 @@ export default function AdminReviews() {
       fetchPendingResources(pagination.currentPage);
     } catch (error) {
       console.error('拒绝资源出错:', error);
-      toast.error('拒绝资源失败，请稍后再试');
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('拒绝资源失败，请稍后再试');
+      }
     }
   };
 
@@ -263,12 +290,45 @@ export default function AdminReviews() {
             <p className="text-sm text-gray-500 mb-4">
               您正在拒绝资源 "{reviewingResource?.title}"，请填写拒绝原因：
             </p>
-            <textarea
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-2 mb-4 h-32"
-              placeholder="请填写拒绝原因，该原因将发送给资源上传者"
-            ></textarea>
+            <div className="mb-4">
+              <textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                className={`w-full border rounded-md p-2 h-32 ${
+                  rejectReason.length < 5 && rejectReason.length > 0
+                    ? 'border-red-300 focus:border-red-500'
+                    : rejectReason.length > 500
+                    ? 'border-red-300 focus:border-red-500'
+                    : 'border-gray-300 focus:border-blue-500'
+                } focus:outline-none focus:ring-1 ${
+                  rejectReason.length < 5 && rejectReason.length > 0
+                    ? 'focus:ring-red-500'
+                    : rejectReason.length > 500
+                    ? 'focus:ring-red-500'
+                    : 'focus:ring-blue-500'
+                }`}
+                placeholder="请填写拒绝原因，该原因将发送给资源上传者（5-500字符）"
+                maxLength={500}
+              ></textarea>
+              <div className="flex justify-between items-center mt-1">
+                <div className="text-xs">
+                  {rejectReason.length < 5 && rejectReason.length > 0 && (
+                    <span className="text-red-500">至少需要5个字符</span>
+                  )}
+                  {rejectReason.length > 500 && (
+                    <span className="text-red-500">超过500字符限制</span>
+                  )}
+                  {rejectReason.length >= 5 && rejectReason.length <= 500 && rejectReason.length > 0 && (
+                    <span className="text-green-500">字符长度符合要求</span>
+                  )}
+                </div>
+                <span className={`text-xs ${
+                  rejectReason.length > 500 ? 'text-red-500' : 'text-gray-500'
+                }`}>
+                  {rejectReason.length}/500
+                </span>
+              </div>
+            </div>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={closeRejectModal}
@@ -278,7 +338,12 @@ export default function AdminReviews() {
               </button>
               <button
                 onClick={handleReject}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                disabled={rejectReason.trim().length < 5 || rejectReason.trim().length > 500}
+                className={`px-4 py-2 rounded-md ${
+                  rejectReason.trim().length < 5 || rejectReason.trim().length > 500
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-red-600 text-white hover:bg-red-700'
+                }`}
               >
                 确认拒绝
               </button>
